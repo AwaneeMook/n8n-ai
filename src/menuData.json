@@ -1,0 +1,62 @@
+{
+  "pageTitle": "Main Menu",
+  "pageSubtitle": "เลือกตัวละครหรือตำแหน่งเพื่อไปต่อ",
+  "items": [
+    {
+      "id": "commander",
+      "title": "The Commander",
+      "description": "กลับไปหน้า login",
+      "image": "https://img.icons8.com/fluency/96/000000/ship.png",
+      "position": "topLeft",
+      "action": "login"
+    },
+    {
+      "id": "visionary",
+      "title": "The Visionary",
+      "description": "สำรวจอนาคต",
+      "image": "https://img.icons8.com/fluency/96/000000/telescope.png",
+      "position": "topRight",
+      "action": "none"
+    },
+    {
+      "id": "moralAnchor",
+      "title": "The Moral Anchor",
+      "description": "ยึดมั่นในคุณค่า",
+      "image": "https://img.icons8.com/fluency/96/000000/compass.png",
+      "position": "middleLeft",
+      "action": "none"
+    },
+    {
+      "id": "strategist",
+      "title": "The Strategist",
+      "description": "วางแผนล่วงหน้า",
+      "image": "https://img.icons8.com/fluency/96/000000/treasure-map.png",
+      "position": "middleCenter",
+      "action": "none"
+    },
+    {
+      "id": "mentor",
+      "title": "The Mentor",
+      "description": "ชี้นำและสนับสนุน",
+      "image": "https://img.icons8.com/fluency/96/000000/lighthouse.png",
+      "position": "middleRight",
+      "action": "none"
+    },
+    {
+      "id": "stabilizer",
+      "title": "The Stabilizer",
+      "description": "ให้สมดุลและมั่นคง",
+      "image": "https://img.icons8.com/fluency/96/000000/anchor.png",
+      "position": "bottomLeft",
+      "action": "none"
+    },
+    {
+      "id": "catalyst",
+      "title": "The Catalyst",
+      "description": "สร้างพลังและการเปลี่ยนแปลง",
+      "image": "https://img.icons8.com/fluency/96/000000/wave.png",
+      "position": "bottomRight",
+      "action": "none"
+    }
+  ]
+}
