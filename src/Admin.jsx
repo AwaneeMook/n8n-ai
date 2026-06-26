@@ -224,7 +224,7 @@ export default function Admin({ onBack }) {
         ...prev,
         {
           role: "assistant",
-          text: "⚠️ เกิดข้อผิดพลาด ไม่สามารถดึงคำตอบได้ กรุณาลองใหม่อีกครั้ง",
+          text: "⚠️ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
           time: new Date().toLocaleTimeString("th-TH", {
             hour: "2-digit",
             minute: "2-digit",

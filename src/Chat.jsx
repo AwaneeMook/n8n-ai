@@ -197,7 +197,7 @@ export default function Chat({
         ...prev,
         {
           role: "system",
-          text: "⚠️ เกิดข้อผิดพลาด ไม่สามารถดึงคำตอบได้ กรุณาลองใหม่อีกครั้ง",
+          text: "⚠️ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
           time: now(),
         },
       ]);
@@ -292,7 +292,7 @@ export default function Chat({
         >
           {/* Row top — logo frame */}
           <div
-            className="flex-shrink-0 relative w-full px-8 pt-4"
+            className="flex-shrink-0 relative w-full pl-4 pr-8 pt-4 mb-4"
             style={{ height: "150px" }}
           >
             <div className="relative w-full h-full flex items-center justify-center">
@@ -357,7 +357,7 @@ export default function Chat({
             </div>
 
             {/* Product */}
-            <div className="flex flex-row gap-0 justify-center w-full">
+            <div className="flex flex-row gap-0 justify-center w-full pt-4">
               {(top3.length > 0 ? top3 : (activePersonaData?.top3 ?? []))
                 .slice(0, 3)
                 .map((p, idx) => (
@@ -404,7 +404,7 @@ export default function Chat({
                 top: "0",
                 bottom: "12px",
                 width: "calc(100% - 24px)",
-                height: "calc(100% - 12px)",
+                height: "calc(100% - 18px)",
               }}
             />
             <img
@@ -793,7 +793,7 @@ export default function Chat({
                   <div
                     key={m.personid}
                     onClick={() => handleMemberClick(m)}
-                    className={`group flex items-center gap-1 overflow-hidden px-2 cursor-pointer transition ${m.personid === activeMember?.personid ? "brightness-125" : ""}`}
+                    className="group flex items-center gap-1 overflow-hidden px-2 cursor-pointer transition"
                     style={{
                       height: "68px",
                       backgroundImage: "url('/img/chat/6.png')",

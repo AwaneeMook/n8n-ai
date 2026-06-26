@@ -471,13 +471,7 @@ export default function Detail({
                   visiblePersons.map((member) => (
                     <div
                       key={member.personid}
-                      className="flex items-center gap-1 overflow-visible px-2 cursor-pointer hover:brightness-125 transition"
-                      onClick={() =>
-                        onSelectMember?.(member, {
-                          ...personaData,
-                          top3: top3.map((name) => ({ name })),
-                        })
-                      }
+                      className="flex items-center gap-1 overflow-visible px-2 transition"
                       style={{
                         height: "80px",
                         backgroundImage: "url('/img/chat/6.png')",
