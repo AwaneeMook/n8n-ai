@@ -250,7 +250,6 @@ export default function Admin({ onBack }) {
       `Sales Skills ${resolveCriteria("salesskill", attrValues.salesskill)} ` +
       `Technology ${resolveCriteria("technology", attrValues.technology)}`;
     return {
-      cluster: persona?.key ?? "",
       prompt: promptText,
       custer: persona?.label ?? "",
       attibute,

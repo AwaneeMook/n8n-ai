@@ -60,7 +60,6 @@ export function buildQuickPayload({ persona, personaData, memberMode, personId, 
   }
 
   return {
-    cluster: clusterKey,
     prompt: `${title} ของกลุ่มคนที่ Cluster ${clusterName} ข้อมูลส่วนตัว Gender ${gender} Age ${age} Education ${education} Occupation ${occupation} Full Time Experience ${experience} years District ${district} ขายประกันแบบ ${products} มากสุดเรียงตามลำดับ `,
     custer: clusterName,
     attibute,

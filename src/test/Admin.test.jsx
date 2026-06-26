@@ -155,7 +155,7 @@ describe('Admin — Quick Prompts', () => {
     expect(url).toContain('/chat/quick')
 
     const body = JSON.parse(opts.body)
-    expect(body).toHaveProperty('cluster')
+    expect(body).not.toHaveProperty('cluster')
     expect(body).toHaveProperty('prompt', 'วิเคราะห์ด้าน Recruit')
     expect(body).toHaveProperty('custer')
     expect(body).toHaveProperty('attibute')

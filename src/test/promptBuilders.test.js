@@ -24,7 +24,7 @@ const PERSONA_DATA = {
 // ─── buildQuickPayload ───────────────────────────────────────────────────────
 
 describe('buildQuickPayload — cluster mode (memberMode=false)', () => {
-  it('มี field ครบ: cluster, prompt, custer, attibute', () => {
+  it('มี field ครบ: prompt, custer, attibute (ไม่มี cluster)', () => {
     const result = buildQuickPayload({
       persona: PERSONA_G01,
       personaData: PERSONA_DATA,
@@ -32,21 +32,10 @@ describe('buildQuickPayload — cluster mode (memberMode=false)', () => {
       personId: '',
       title: 'วิเคราะห์หา Insight',
     })
-    expect(result).toHaveProperty('cluster')
+    expect(result).not.toHaveProperty('cluster')
     expect(result).toHaveProperty('prompt')
     expect(result).toHaveProperty('custer')
     expect(result).toHaveProperty('attibute')
-  })
-
-  it('cluster ตรงกับ persona.key', () => {
-    const result = buildQuickPayload({
-      persona: PERSONA_G01,
-      personaData: PERSONA_DATA,
-      memberMode: false,
-      personId: '',
-      title: 'test',
-    })
-    expect(result.cluster).toBe('G01')
   })
 
   it('custer ตรงกับ persona.label', () => {
@@ -102,7 +91,7 @@ describe('buildQuickPayload — cluster mode (memberMode=false)', () => {
 })
 
 describe('buildQuickPayload — member mode (memberMode=true)', () => {
-  it('มี personId แทน cluster', () => {
+  it('มี personId ไม่มี cluster', () => {
     const result = buildQuickPayload({
       persona: PERSONA_G01,
       personaData: PERSONA_DATA,
