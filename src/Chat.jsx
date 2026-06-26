@@ -35,10 +35,10 @@ const QUICK_PROMPTS = [
     title: "แนะนำ CRM Strategy",
   },
   {
-    label: "แนะนำอบรม",
+    label: "แนะนำ Course เรียน",
     img: "/img/chat/icon-chat-5.png",
     promptFn: "training",
-    title: "แนะนำอบรม",
+    title: "แนะนำ Course เรียน",
   },
   {
     label: "AI Role Play",
