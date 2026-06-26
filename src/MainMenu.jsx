@@ -7,6 +7,7 @@ const KEY_TO_ID = { G01: 1, G02: 2, G03: 3, G05: 4, G07: 5, G08: 6, G10: 7 };
 const KEY_TO_LABEL = { G01: "The Commander", G02: "The Visionary", G03: "The Moral Anchor", G05: "The Strategist", G07: "The Mentor", G08: "The Stabilizer", G10: "The Catalyst" };
 
 let _personaCache = null;
+export function __resetPersonaCache() { _personaCache = null }
 
 function buildRows(items) {
   const n = items.length;
