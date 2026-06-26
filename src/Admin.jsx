@@ -105,18 +105,29 @@ export default function Admin({ onBack }) {
 
   // Chat state
   const [messages, setMessages] = useState([
-    { role: "assistant", text: "สวัสดี! มีอะไรให้ช่วยไหมครับ?", time: "" },
+    {
+      role: "assistant",
+      text: "Welcome! How can I assist you on your mission today?",
+      time: "",
+    },
   ]);
   const [input, setInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const chatScrollRef = useRef(null);
+  const lastMsgRef = useRef(null);
   const saveTimerRef = useRef(null);
 
   useEffect(() => {
-    // scroll only the chat container — never scrollIntoView (it scrolls
-    // overflow-hidden ancestors too and pushes the header out of view on refresh)
-    const el = chatScrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    const container = chatScrollRef.current;
+    if (!container) return;
+    const lastMsg = messages[messages.length - 1];
+    if (!chatLoading && lastMsg?.role !== "user" && lastMsgRef.current) {
+      const msgTop = lastMsgRef.current.getBoundingClientRect().top;
+      const containerTop = container.getBoundingClientRect().top;
+      container.scrollTop += msgTop - containerTop - 12;
+    } else {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [messages, chatLoading]);
 
   useEffect(() => {
@@ -179,7 +190,11 @@ export default function Admin({ onBack }) {
   const handlePersonaChange = (item) => {
     setPersona(item);
     setMessages([
-      { role: "assistant", text: "สวัสดี! มีอะไรให้ช่วยไหมครับ?", time: "" },
+      {
+        role: "assistant",
+        text: "Welcome! How can I assist you on your mission today?",
+        time: "",
+      },
     ]);
   };
 
@@ -327,7 +342,7 @@ export default function Admin({ onBack }) {
         {/* Left 40% */}
         <div className="w-full lg:w-[40%] flex flex-col items-center justify-center">
           {/* Top: form */}
-          <div className="px-6 pb-6 pt-0 flex flex-col justify-center gap-4 items-center w-full mt-16">
+          <div className="px-6 pb-6 pt-0 flex flex-col justify-center gap-4 items-center w-full mt-12">
             <div className="w-full max-w-[400px]">
               <h2
                 className="text-2xl font-bold text-left mb-4"
@@ -440,6 +455,8 @@ export default function Admin({ onBack }) {
                             const raw = e.target.value
                               .replace(/\D/g, "")
                               .slice(0, 1);
+                            // ไม่อัปเดต state ถ้าพิม 0 (แสดงค่าเดิมไว้)
+                            if (raw === "0") return;
                             const next = { ...attrValues, [key]: raw };
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
@@ -447,7 +464,7 @@ export default function Admin({ onBack }) {
                           onBlur={(e) => {
                             const val = Math.min(
                               5,
-                              Math.max(0, Number(e.target.value) || 0),
+                              Math.max(1, Number(e.target.value) || 1),
                             );
                             const next = { ...attrValues, [key]: val };
                             setAttrValues(next);
@@ -519,6 +536,7 @@ export default function Admin({ onBack }) {
                 {messages.map((msg, i) => (
                   <div
                     key={i}
+                    ref={i === messages.length - 1 ? lastMsgRef : null}
                     className={`flex items-end gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {msg.role !== "user" && (

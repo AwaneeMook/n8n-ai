@@ -15,36 +15,42 @@ const QUICK_PROMPTS = [
     img: "/img/chat/icon-chat-1.png",
     promptFn: "insight",
     title: "วิเคราะห์หา Insight",
+    connector: "ของกลุ่ม",
   },
   {
     label: "แนะนำกลยุทธ์การพัฒนาจุดแข็งจุดอ่อน",
     img: "/img/chat/icon-chat-2.png",
     promptFn: "strategy",
     title: "แนะนำกลยุทธ์การพัฒนาจุดแข็งจุดอ่อน",
+    connector: "ของกลุ่ม",
   },
   {
     label: "แนะนำแนวการขาย",
     img: "/img/chat/icon-chat-3.png",
     promptFn: "sales",
     title: "แนะนำแนวการขาย",
+    connector: "สำหรับกลุ่ม",
   },
   {
     label: "แนะนำ CRM Strategy",
     img: "/img/chat/icon-chat-4.png",
     promptFn: "activity",
     title: "แนะนำ CRM Strategy",
+    connector: "สำหรับกลุ่ม",
   },
   {
     label: "แนะนำ Course เรียน",
     img: "/img/chat/icon-chat-5.png",
     promptFn: "training",
     title: "แนะนำ Course เรียน",
+    connector: "สำหรับกลุ่ม",
   },
   {
     label: "AI Role Play",
     img: "/img/chat/icon-chat-1.png",
     promptFn: "roleplay",
     title: "AI Role Play",
+    connector: "ของกลุ่ม",
   },
 ];
 
@@ -82,6 +88,7 @@ export default function Chat({
     !personaData || membersProp.length === 0,
   );
   const chatScrollRef = useRef(null);
+  const lastMsgRef = useRef(null);
 
   // Fetch persona data if missing (e.g. after page refresh)
   useEffect(() => {
@@ -144,9 +151,18 @@ export default function Chat({
   );
 
   useEffect(() => {
-    // scroll เฉพาะกล่องแชท — ไม่ใช้ scrollIntoView (มันเลื่อน ancestor overflow-hidden ด้วย)
-    const el = chatScrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
+    const container = chatScrollRef.current;
+    if (!container) return;
+    const lastMsg = messages[messages.length - 1];
+    // AI ตอบกลับ → scroll ให้หัวข้อความอยู่ที่บนของ container
+    if (!loading && lastMsg?.role !== "user" && lastMsgRef.current) {
+      const msgTop = lastMsgRef.current.getBoundingClientRect().top;
+      const containerTop = container.getBoundingClientRect().top;
+      container.scrollTop += msgTop - containerTop - 12;
+    } else {
+      // user ส่งข้อความ หรือ loading → scroll ลงล่างเพื่อเห็น typing indicator
+      container.scrollTop = container.scrollHeight;
+    }
   }, [messages, loading]);
 
   const appendUserAndFetch = async (
@@ -212,8 +228,9 @@ export default function Chat({
   const memberSelected = !!(activeMember?.personid ?? activeMember?.id);
 
   const handlePromptClick = (p) => {
-    // ทุก quick prompt → เรียก /chat/quick ด้วย payload คอนเซปเดียวกัน
-    // (เลือก member = ส่ง personId + prompt สั้น | ไม่เลือก = ส่ง cluster + prompt เต็ม)
+    const displayText = memberSelected
+      ? `${p.label} ${p.connector.replace("กลุ่ม", "").trim()} ${personId}`
+      : `${p.label} ${p.connector} ${persona?.label ?? ""}`
     const payload = buildQuickPayload({
       persona,
       personaData: withTop3(),
@@ -221,7 +238,7 @@ export default function Chat({
       personId,
       title: p.title ?? p.label,
     });
-    appendUserAndFetch(p.label, null, payload, CHAT_QUICK_URL);
+    appendUserAndFetch(displayText, null, payload, CHAT_QUICK_URL);
   };
 
   const handleSend = () => {
@@ -618,6 +635,7 @@ export default function Chat({
               {messages.map((msg, i) => (
                 <div
                   key={i}
+                  ref={i === messages.length - 1 ? lastMsgRef : null}
                   className={`flex items-start gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role !== "user" && (
