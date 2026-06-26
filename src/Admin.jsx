@@ -1,9 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { MOCK, mockPersona, mockChat } from "./data/mockData";
+import { attributeCriteria } from "./data/attributeCriteria";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "https://tli0107.candidsandbox.academy/webhook";
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  "https://tli0107.candidsandbox.academy/webhook";
 const PERSONA_URL = `${API_BASE}/persona`;
 const PERSONA_SAVE_URL = `${API_BASE}/persona/save`;
+const CHAT_URL = `${API_BASE}/chat`;
+const CHAT_QUICK_URL = `${API_BASE}/chat/quick`;
+
+function resolveCriteria(attrKey, starValue) {
+  const def = attributeCriteria[attrKey];
+  if (!def || !starValue) return "ไม่มีข้อมูล";
+  const found = def.stars.find((s) => s.star === Number(starValue));
+  if (!found) return "ไม่มีข้อมูล";
+  return found.criteria;
+}
 
 const neonBorderStyle = {
   border: "1.5px solid #3366dd",
@@ -97,8 +109,8 @@ export default function Admin({ onBack }) {
   ]);
   const [input, setInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
-  const bottomRef = useRef(null);
   const chatScrollRef = useRef(null);
+  const saveTimerRef = useRef(null);
 
   useEffect(() => {
     // scroll only the chat container — never scrollIntoView (it scrolls
@@ -110,19 +122,6 @@ export default function Admin({ onBack }) {
   useEffect(() => {
     if (!persona?.key) return;
     setPersonaLoading(true);
-    if (MOCK) {
-      const d = mockPersona.data;
-      setPersonId(d.personid ?? "");
-      setAttrValues({
-        recruit: d.attribute?.recruit ?? "",
-        management: d.attribute?.management ?? "",
-        salesskill: d.attribute?.salesskill ?? "",
-        technology: d.attribute?.technology ?? "",
-      });
-      setPersonaLoading(false);
-      setInitialLoad(false);
-      return;
-    }
     fetch(PERSONA_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -154,13 +153,13 @@ export default function Admin({ onBack }) {
       .finally(() => {
         setPersonaLoading(false);
         setInitialLoad(false);
-        setIsDirty(false);
       });
   }, [persona?.key]);
 
   const callSaveAttr = (values, pid) => {
-    const digits = (pid ?? personId).replace(/\s/g, "");
-    if (!MOCK)
+    clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      const digits = (pid ?? personId).replace(/\s/g, "");
       fetch(PERSONA_SAVE_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -173,12 +172,18 @@ export default function Admin({ onBack }) {
           technology: Number(values.technology),
         }),
       }).catch(() => {});
+    }, 1000);
   };
 
   const handleBack = () => onBack();
-  const handlePersonaChange = (item) => setPersona(item);
+  const handlePersonaChange = (item) => {
+    setPersona(item);
+    setMessages([
+      { role: "assistant", text: "สวัสดี! มีอะไรให้ช่วยไหมครับ?", time: "" },
+    ]);
+  };
 
-  const sendChat = async (rawText) => {
+  const sendChat = async (rawText, endpoint = CHAT_URL, customBody = null) => {
     const text = (rawText ?? "").trim();
     if (!text || chatLoading) return;
     const now = new Date().toLocaleTimeString("th-TH", {
@@ -187,30 +192,12 @@ export default function Admin({ onBack }) {
     });
     setMessages((prev) => [...prev, { role: "user", text, time: now }]);
     setChatLoading(true);
-    if (MOCK) {
-      setTimeout(() => {
-        const m = mockChat[0];
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            text: m.answer,
-            suggestions: m.suggestions,
-            time: new Date().toLocaleTimeString("th-TH", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-          },
-        ]);
-        setChatLoading(false);
-      }, 800);
-      return;
-    }
     try {
-      const res = await fetch(`${API_BASE}/chat`, {
+      const body = customBody ?? { message: text };
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json().catch(() => null);
@@ -253,18 +240,26 @@ export default function Admin({ onBack }) {
     const text = input.trim();
     if (!text || chatLoading) return;
     setInput("");
-    sendChat(text);
+    sendChat(text, CHAT_URL, { personId: persona?.key ?? "", prompt: text });
   };
 
-  // Quick Prompt builders — แต่ละด้านมีฟังก์ชันของตัวเอง
-  // (ตอนนี้ยังไม่ทำอะไร แค่ return คำนั้นกลับไปก่อน)
-  const buildRecruitPrompt = () => "วิเคราะห์ด้าน Recruit";
-  const buildManagementPrompt = () => "วิเคราะห์ด้าน Management";
-  const buildSalesPrompt = () => "วิเคราะห์ด้าน Sales Skills";
-  const buildTechnologyPrompt = () => "วิเคราะห์ด้าน Technology";
+  const buildAdminQuickPayload = (promptText) => {
+    const attibute =
+      `Recruit ${resolveCriteria("recruit", attrValues.recruit)} ` +
+      `Management ${resolveCriteria("management", attrValues.management)} ` +
+      `Sales Skills ${resolveCriteria("salesskill", attrValues.salesskill)} ` +
+      `Technology ${resolveCriteria("technology", attrValues.technology)}`;
+    return {
+      cluster: persona?.key ?? "",
+      prompt: promptText,
+      custer: persona?.label ?? "",
+      attibute,
+    };
+  };
 
-  const handleQuickPrompt = (build) => {
-    sendChat(build());
+  const handleQuickPrompt = (promptText) => {
+    const payload = buildAdminQuickPayload(promptText);
+    sendChat(promptText, CHAT_QUICK_URL, payload);
   };
 
   const handleChatKeyDown = (e) => {
@@ -473,14 +468,26 @@ export default function Admin({ onBack }) {
                 </div>
                 <div className="grid grid-cols-1 gap-2">
                   {[
-                    { label: "วิเคราะห์ด้าน Recruit", img: "/img/chat/icon-chat-1.png", build: buildRecruitPrompt },
-                    { label: "วิเคราะห์ด้าน Management", img: "/img/chat/icon-chat-2.png", build: buildManagementPrompt },
-                    { label: "วิเคราะห์ด้าน Sales Skills", img: "/img/chat/icon-chat-3.png", build: buildSalesPrompt },
-                    { label: "วิเคราะห์ด้าน Technology", img: "/img/chat/icon-chat-4.png", build: buildTechnologyPrompt },
+                    {
+                      label: "วิเคราะห์ด้าน Recruit",
+                      img: "/img/chat/icon-chat-1.png",
+                    },
+                    {
+                      label: "วิเคราะห์ด้าน Management",
+                      img: "/img/chat/icon-chat-2.png",
+                    },
+                    {
+                      label: "วิเคราะห์ด้าน Sales Skills",
+                      img: "/img/chat/icon-chat-3.png",
+                    },
+                    {
+                      label: "วิเคราะห์ด้าน Technology",
+                      img: "/img/chat/icon-chat-4.png",
+                    },
                   ].map((p) => (
                     <button
                       key={p.label}
-                      onClick={() => handleQuickPrompt(p.build)}
+                      onClick={() => handleQuickPrompt(p.label)}
                       disabled={chatLoading}
                       className="flex flex-row items-center gap-2 rounded-lg border border-sky-400/40 bg-sky-500/10 px-2.5 py-2 text-left text-xs font-medium text-white transition hover:bg-sky-500/25 hover:border-sky-400 active:scale-95 disabled:opacity-50"
                     >
@@ -496,7 +503,10 @@ export default function Admin({ onBack }) {
               </div>
             </div>
             {/* Row 2 — chat */}
-            <div className="relative flex flex-col overflow-hidden flex-shrink-0" style={{ height: "clamp(340px, 46vh, 600px)" }}>
+            <div
+              className="relative flex flex-col overflow-hidden flex-shrink-0"
+              style={{ height: "clamp(340px, 46vh, 600px)" }}
+            >
               <img
                 src="/img/chat/4.png"
                 alt=""
@@ -586,7 +596,6 @@ export default function Admin({ onBack }) {
                     </div>
                   </div>
                 )}
-                <div ref={bottomRef} />
               </div>
               <div className="relative px-10 py-4 pb-6 flex gap-3 items-end">
                 <textarea

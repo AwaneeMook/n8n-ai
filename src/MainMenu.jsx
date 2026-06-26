@@ -6,6 +6,8 @@ const ALL_PERSONA_URL = "https://tli0107.candidsandbox.academy/webhook/all_perso
 const KEY_TO_ID = { G01: 1, G02: 2, G03: 3, G05: 4, G07: 5, G08: 6, G10: 7 };
 const KEY_TO_LABEL = { G01: "The Commander", G02: "The Visionary", G03: "The Moral Anchor", G05: "The Strategist", G07: "The Mentor", G08: "The Stabilizer", G10: "The Catalyst" };
 
+let _personaCache = null;
+
 function buildRows(items) {
   const n = items.length;
   if (n <= 3) return [items];
@@ -34,9 +36,16 @@ export default function MainMenu({ onLogout, onBack, onSelect, onAdmin }) {
           label: p.name ?? KEY_TO_LABEL[key] ?? clusterByKey[key]?.persona ?? key,
         };
       });
+      _personaCache = list;
       setPersonas(list);
       setLoading(false);
     };
+
+    if (_personaCache) {
+      setPersonas(_personaCache);
+      setLoading(false);
+      return;
+    }
 
     fetch(ALL_PERSONA_URL)
       .then((r) => r.json())

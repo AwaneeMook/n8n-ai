@@ -1,15 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  buildInsightPrompt,
-  buildStrategyPrompt,
-  buildActivityPrompt,
-  buildSalesPrompt,
-} from "./data/promptBuilders";
+import { buildQuickPayload } from "./data/promptBuilders";
 
-const CHAT_URL = "https://tli0107.candidsandbox.academy/webhook/chat";
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
   "https://tli0107.candidsandbox.academy/webhook";
+const CHAT_URL = `${API_BASE}/chat`;
+const CHAT_QUICK_URL = `${API_BASE}/chat/quick`;
 const PERSONA_URL = `${API_BASE}/persona`;
 const DISTANCE_URL = `${API_BASE}/persona/member`;
 
@@ -18,23 +14,38 @@ const QUICK_PROMPTS = [
     label: "วิเคราะห์ Insight",
     img: "/img/chat/icon-chat-1.png",
     promptFn: "insight",
+    title: "วิเคราะห์หา Insight",
   },
   {
     label: "แนะนำกลยุทธ์การพัฒนาจุดแข็งจุดอ่อน",
     img: "/img/chat/icon-chat-2.png",
     promptFn: "strategy",
+    title: "แนะนำกลยุทธ์การพัฒนาจุดแข็งจุดอ่อน",
   },
   {
     label: "แนะนำแนวการขาย",
     img: "/img/chat/icon-chat-3.png",
     promptFn: "sales",
+    title: "แนะนำแนวการขาย",
   },
   {
     label: "แนะนำ CRM Strategy",
     img: "/img/chat/icon-chat-4.png",
     promptFn: "activity",
+    title: "แนะนำ CRM Strategy",
   },
-  { label: "AI Role Play", img: "/img/chat/icon-chat-1.png" },
+  {
+    label: "แนะนำอบรม",
+    img: "/img/chat/icon-chat-5.png",
+    promptFn: "training",
+    title: "แนะนำอบรม",
+  },
+  {
+    label: "AI Role Play",
+    img: "/img/chat/icon-chat-1.png",
+    promptFn: "roleplay",
+    title: "AI Role Play",
+  },
 ];
 
 export default function Chat({
@@ -70,7 +81,7 @@ export default function Chat({
   const [bootLoading, setBootLoading] = useState(
     !personaData || membersProp.length === 0,
   );
-  const bottomRef = useRef(null);
+  const chatScrollRef = useRef(null);
 
   // Fetch persona data if missing (e.g. after page refresh)
   useEffect(() => {
@@ -133,23 +144,32 @@ export default function Chat({
   );
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // scroll เฉพาะกล่องแชท — ไม่ใช้ scrollIntoView (มันเลื่อน ancestor overflow-hidden ด้วย)
+    const el = chatScrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, loading]);
 
-  const appendUserAndFetch = async (displayText, apiPrompt) => {
+  const appendUserAndFetch = async (
+    displayText,
+    apiPrompt,
+    customBody,
+    endpoint = CHAT_URL,
+  ) => {
     setMessages((prev) => [
       ...prev,
       { role: "user", text: displayText, time: now() },
     ]);
     setLoading(true);
     try {
-      const res = await fetch(CHAT_URL, {
+      const body = customBody ?? {
+        // เลือก member → personId ของคนนั้น | ไม่เลือก → key ของ persona ที่เลือกอยู่ (G01/G02/...)
+        personId: personId || persona?.key || "G01",
+        prompt: apiPrompt,
+      };
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          personId: personId || "G01",
-          prompt: apiPrompt,
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json().catch(() => null);
@@ -188,20 +208,20 @@ export default function Chat({
 
   const withTop3 = () => ({ ...activePersonaData, top3 });
 
-  // ตัดข้อมูลส่วนตัว+top3 ออก "เฉพาะตอนเลือก member" (จะ query ข้อมูลคนนั้นแยกแล้วส่งให้ AI เอง)
+  // เลือก member อยู่ไหม → ตัดข้อมูลส่วนตัว+top3 ออก ส่งแค่ personId (query คนนั้นแยกที่ backend)
   const memberSelected = !!(activeMember?.personid ?? activeMember?.id);
-  const memberMode = memberSelected;
-
-  const PROMPT_BUILDERS = {
-    insight: () => buildInsightPrompt(persona, withTop3(), memberMode),
-    strategy: () => buildStrategyPrompt(persona, withTop3()),
-    sales: () => buildSalesPrompt(persona, withTop3()),
-    activity: () => buildActivityPrompt(persona, withTop3()),
-  };
 
   const handlePromptClick = (p) => {
-    const buildFn = PROMPT_BUILDERS[p.promptFn];
-    appendUserAndFetch(p.label, buildFn ? buildFn() : p.label);
+    // ทุก quick prompt → เรียก /chat/quick ด้วย payload คอนเซปเดียวกัน
+    // (เลือก member = ส่ง personId + prompt สั้น | ไม่เลือก = ส่ง cluster + prompt เต็ม)
+    const payload = buildQuickPayload({
+      persona,
+      personaData: withTop3(),
+      memberMode: memberSelected,
+      personId,
+      title: p.title ?? p.label,
+    });
+    appendUserAndFetch(p.label, null, payload, CHAT_QUICK_URL);
   };
 
   const handleSend = () => {
@@ -219,12 +239,30 @@ export default function Chat({
   };
 
   const handleMemberClick = (m) => {
+    const clickedId = m?.personid ?? m?.id;
+    const activeId = activeMember?.personid ?? activeMember?.id;
+
+    // คลิกคนเดิมซ้ำ → ยกเลิกการเลือก กลับเป็นสถานะยังไม่เลือก
+    if (clickedId && clickedId === activeId) {
+      setActiveMember(null);
+      if (onSelectMember) onSelectMember(null, activePersonaData);
+      setMessages([
+        {
+          role: "system",
+          text: `Welcome back, Agent! How can I assist you on your mission today?`,
+          time: now(),
+        },
+      ]);
+      return;
+    }
+
     setActiveMember(m);
     if (onSelectMember) onSelectMember(m, activePersonaData);
     setMessages([
       {
         role: "system",
         text: `Switched to ${m.personid}. How can I assist you?`,
+        time: now(),
       },
     ]);
   };
@@ -485,7 +523,7 @@ export default function Chat({
                 className="absolute object-contain pointer-events-none"
                 style={{
                   top: "50%",
-                  left: "calc(50% + 3px)",
+                  left: "48px",
                   transform: "translate(-50%, -50%)",
                   width: "100px",
                   height: "100px",
@@ -497,8 +535,8 @@ export default function Chat({
                 alt=""
                 className="relative object-contain"
                 style={{
-                  width: "85%",
-                  height: "85%",
+                  width: "95%",
+                  height: "95%",
                   transform: "translateX(6px)",
                 }}
               />
@@ -573,6 +611,7 @@ export default function Chat({
               }}
             />
             <div
+              ref={chatScrollRef}
               className="relative flex-1 overflow-y-auto flex flex-col gap-4"
               style={{ margin: "16px 20px 8px 20px", padding: "0 28px" }}
             >
@@ -670,7 +709,6 @@ export default function Chat({
                   </div>
                 </div>
               )}
-              <div ref={bottomRef} />
             </div>
 
             {/* Input */}
