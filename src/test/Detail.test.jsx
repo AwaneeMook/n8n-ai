@@ -121,7 +121,16 @@ describe('Detail — หลัง fetch', () => {
 // ─── Interactions ─────────────────────────────────────────────────────────────
 
 describe('Detail — interactions', () => {
-  it('คลิก member → เรียก onSelectMember พร้อมข้อมูล member', async () => {
+  it('member card ไม่มี cursor-pointer (กดไม่ได้)', async () => {
+    mockFetch()
+    render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
+
+    await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
+    const card = screen.getByText('A0000001').closest('div[style]')
+    expect(card?.className).not.toContain('cursor-pointer')
+  })
+
+  it('คลิก member → ไม่เรียก onSelectMember', async () => {
     mockFetch()
     const onSelectMember = vi.fn()
     render(
@@ -131,8 +140,7 @@ describe('Detail — interactions', () => {
     await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
     fireEvent.click(screen.getByText('A0000001'))
 
-    expect(onSelectMember).toHaveBeenCalledTimes(1)
-    expect(onSelectMember.mock.calls[0][0]).toMatchObject({ personid: 'A0000001' })
+    expect(onSelectMember).not.toHaveBeenCalled()
   })
 
   it('คลิก Back → เรียก onBack', async () => {
