@@ -4,7 +4,7 @@ import { buildQuickPayload } from "./data/promptBuilders";
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
   "https://tli0107.candidsandbox.academy/webhook";
-const CHAT_URL = `${API_BASE}/chat`;
+const CHAT_URL = `${API_BASE}/chat/quick`;
 const CHAT_QUICK_URL = `${API_BASE}/chat/quick`;
 const PERSONA_URL = `${API_BASE}/persona`;
 const DISTANCE_URL = `${API_BASE}/persona/member`;

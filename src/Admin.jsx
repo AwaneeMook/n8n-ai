@@ -6,7 +6,7 @@ const API_BASE =
   "https://tli0107.candidsandbox.academy/webhook";
 const PERSONA_URL = `${API_BASE}/persona`;
 const PERSONA_SAVE_URL = `${API_BASE}/persona/save`;
-const CHAT_URL = `${API_BASE}/chat`;
+const CHAT_URL = `${API_BASE}/chat/quick`;
 const CHAT_QUICK_URL = `${API_BASE}/chat/quick`;
 
 function resolveCriteria(attrKey, starValue) {

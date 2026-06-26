@@ -255,8 +255,7 @@ describe('Admin — Chat input', () => {
 
     await waitFor(() => expect(fetch).toHaveBeenCalled())
     const [url, opts] = fetch.mock.calls[0]
-    expect(url).toContain('/chat')
-    expect(url).not.toContain('/chat/quick')
+    expect(url).toContain('/chat/quick')
 
     const body = JSON.parse(opts.body)
     expect(body).toHaveProperty('personId')
