@@ -230,7 +230,7 @@ export default function Chat({
   const handlePromptClick = (p) => {
     const displayText = memberSelected
       ? `${p.label} ${p.connector.replace("กลุ่ม", "").trim()} ${personId}`
-      : `${p.label} ${p.connector} ${persona?.label ?? ""}`
+      : `${p.label} ${p.connector} ${persona?.label ?? ""}`;
     const payload = buildQuickPayload({
       persona,
       personaData: withTop3(),
@@ -374,7 +374,7 @@ export default function Chat({
             </div>
 
             {/* Product */}
-            <div className="flex flex-row gap-0 justify-center w-full pt-4">
+            <div className="flex flex-row gap-0 justify-center w-full pt-2">
               {(top3.length > 0 ? top3 : (activePersonaData?.top3 ?? []))
                 .slice(0, 3)
                 .map((p, idx) => (
