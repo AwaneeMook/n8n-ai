@@ -8,6 +8,7 @@ const affiliations = ["ทั่วประเทศ", "นครหลวง",
 // module-level cache — fetched once for the lifetime of the page
 let zoneCache = null;
 let zoneFetchPromise = null;
+export function __resetZoneCache() { zoneCache = null; zoneFetchPromise = null; }
 
 function fetchZones() {
   if (zoneCache) return Promise.resolve(zoneCache);
@@ -182,6 +183,8 @@ export default function Filter({ onLogout, onDashboard, onBack, onAdmin, savedFi
   const [zone, setZone] = useState(savedFilter?.zone ?? []);
   const [allZones, setAllZones] = useState([]);
   const [zonesLoading, setZonesLoading] = useState(true);
+  const [zonesError, setZonesError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (zoneCache) {
@@ -191,7 +194,11 @@ export default function Filter({ onLogout, onDashboard, onBack, onAdmin, savedFi
     }
     setZonesLoading(true);
     fetchZones()
-      .then((data) => setAllZones(data))
+      .then((data) => {
+        if (!data || Object.keys(data).length === 0) setZonesError(true);
+        setAllZones(data);
+      })
+      .catch(() => setZonesError(true))
       .finally(() => setZonesLoading(false));
   }, []);
 
@@ -348,6 +355,11 @@ export default function Filter({ onLogout, onDashboard, onBack, onAdmin, savedFi
               value={zone}
               onChange={setZone}
             />
+            {zonesError && (
+              <p className="text-xs font-medium text-rose-500 bg-rose-50/80 rounded-xl px-4 py-2">
+                ⚠️ ไม่สามารถโหลดข้อมูลโซนได้ กรุณาลองใหม่อีกครั้ง
+              </p>
+            )}
 
             <div className="flex justify-center mt-auto pt-16">
               <div className="relative group">

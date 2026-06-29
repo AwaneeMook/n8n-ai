@@ -81,6 +81,7 @@ export default function Detail({
   const [membersLoading, setMembersLoading] = useState(false);
   const [personaData, setPersonaData] = useState(null);
   const [personaLoading, setPersonaLoading] = useState(true);
+  const [personaError, setPersonaError] = useState(false);
   const personsPerPage = 5;
   const pageCount = Math.ceil(members.length / personsPerPage);
   const visiblePersons = members.slice(
@@ -90,6 +91,7 @@ export default function Detail({
 
   useEffect(() => {
     setPersonaLoading(true);
+    setPersonaError(false);
     fetch(PERSONA_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -99,8 +101,9 @@ export default function Detail({
       .then((data) => {
         const item = Array.isArray(data) ? data[0] : data;
         if (item?.success) setPersonaData(item.data);
+        else setPersonaError(true);
       })
-      .catch(() => {})
+      .catch(() => setPersonaError(true))
       .finally(() => setPersonaLoading(false));
   }, [persona?.key]);
 
@@ -314,6 +317,15 @@ export default function Detail({
               {personaLoading && (
                 <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/50 backdrop-blur-sm rounded-[24px]">
                   <div className="h-10 w-10 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
+                </div>
+              )}
+              {!personaLoading && personaError && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-[24px]">
+                  <div className="flex flex-col items-center gap-2 text-center px-4">
+                    <span className="text-2xl">⚠️</span>
+                    <p className="text-sm font-semibold text-white">ไม่สามารถโหลดข้อมูลได้</p>
+                    <p className="text-xs text-white/60">กรุณาลองใหม่อีกครั้ง</p>
+                  </div>
                 </div>
               )}
               <div className="flex flex-col gap-2 pt-2">

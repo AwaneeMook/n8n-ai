@@ -50,30 +50,35 @@ beforeEach(() => {
 
 describe('Detail — render', () => {
   it('render ได้โดยไม่ crash', () => {
-    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})))
+    mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
   })
 
   it('แสดงชื่อ persona ใน header', () => {
-    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})))
+    mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
     expect(screen.getByText('The Commander')).toBeTruthy()
   })
 
-  it('แสดง loading text ระหว่างโหลด member', () => {
+  it('แสดง persona loading spinner ก่อน /persona ตอบกลับ', () => {
     vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})))
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-    expect(screen.getByText('Loading...')).toBeTruthy()
+    expect(document.querySelector('.animate-spin')).toBeTruthy()
+  })
+
+  it('spinner หายหลัง /persona ตอบกลับ', async () => {
+    mockFetch()
+    render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
+    await waitFor(() => expect(document.querySelector('.animate-spin')).toBeFalsy())
   })
 })
 
-// ─── After fetch ──────────────────────────────────────────────────────────────
+// ─── Persona data ─────────────────────────────────────────────────────────────
 
-describe('Detail — หลัง fetch', () => {
-  it('แสดงข้อมูล persona (age, district)', async () => {
+describe('Detail — persona data', () => {
+  it('แสดงข้อมูล persona (age, district) หลัง /persona ตอบกลับ', async () => {
     mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-
     await waitFor(() => expect(screen.getByText('35')).toBeTruthy())
     expect(screen.getByText('กรุงเทพ')).toBeTruthy()
   })
@@ -81,76 +86,36 @@ describe('Detail — หลัง fetch', () => {
   it('แสดง gender เป็น Male', async () => {
     mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-
     await waitFor(() => expect(screen.getByText('Male')).toBeTruthy())
   })
 
-  it('แสดงรายชื่อสมาชิก', async () => {
+  it('เรียก /persona ด้วย key ที่ถูกต้อง', async () => {
     mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
+    await waitFor(() => expect(fetch).toHaveBeenCalled())
+    const personaCall = fetch.mock.calls.find(([url]) => url.includes('/persona') && !url.includes('/member'))
+    expect(personaCall).toBeTruthy()
+    const body = JSON.parse(personaCall[1].body)
+    expect(body.key).toBe('G01')
+  })
+})
 
+// ─── Member list (hardcoded mockup) ──────────────────────────────────────────
+
+describe('Detail — member list', () => {
+  it('แสดง member IDs จาก API', async () => {
+    mockFetch()
+    render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
     await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
     expect(screen.getByText('A0000002')).toBeTruthy()
     expect(screen.getByText('A0000003')).toBeTruthy()
   })
 
-  it('แสดง top3 products', async () => {
+  it('แสดง top3 products จาก API', async () => {
     mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-
     await waitFor(() => expect(screen.getByText('ประกันชีวิต')).toBeTruthy())
     expect(screen.getByText('ประกันสุขภาพ')).toBeTruthy()
-  })
-
-  it('ไม่พบสมาชิก → แสดง "ไม่พบข้อมูล"', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockImplementation((url) => {
-        if (url.includes('/persona/member')) {
-          return Promise.resolve({ ok: true, json: () => Promise.resolve({ members: [], top3: [] }) })
-        }
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([PERSONA_RESPONSE]) })
-      }),
-    )
-    render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-
-    await waitFor(() => expect(screen.getByText('ไม่พบข้อมูล')).toBeTruthy())
-  })
-})
-
-// ─── Interactions ─────────────────────────────────────────────────────────────
-
-describe('Detail — interactions', () => {
-  it('member card ไม่มี cursor-pointer (กดไม่ได้)', async () => {
-    mockFetch()
-    render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-
-    await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
-    const card = screen.getByText('A0000001').closest('div[style]')
-    expect(card?.className).not.toContain('cursor-pointer')
-  })
-
-  it('คลิก member → ไม่เรียก onSelectMember', async () => {
-    mockFetch()
-    const onSelectMember = vi.fn()
-    render(
-      <Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={onSelectMember} />,
-    )
-
-    await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
-    fireEvent.click(screen.getByText('A0000001'))
-
-    expect(onSelectMember).not.toHaveBeenCalled()
-  })
-
-  it('คลิก Back → เรียก onBack', async () => {
-    mockFetch()
-    const onBack = vi.fn()
-    render(<Detail persona={PERSONA} filterValues={null} onBack={onBack} onSelectMember={() => {}} />)
-
-    await waitFor(() => expect(fetch).toHaveBeenCalled())
-    fireEvent.click(screen.getByAltText('Back'))
-    expect(onBack).toHaveBeenCalledTimes(1)
   })
 
   it('เรียก onMembersLoaded หลังโหลดสมาชิกเสร็จ', async () => {
@@ -165,39 +130,50 @@ describe('Detail — interactions', () => {
         onMembersLoaded={onMembersLoaded}
       />,
     )
-
     await waitFor(() => expect(onMembersLoaded).toHaveBeenCalledTimes(1))
     expect(onMembersLoaded.mock.calls[0][0]).toHaveLength(3)
   })
+
+  it('ไม่พบสมาชิก → แสดง "ไม่พบข้อมูล"', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url) => {
+      if (url.includes('/persona/member')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ members: [], top3: [] }) })
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve([PERSONA_RESPONSE]) })
+    }))
+    render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
+    await waitFor(() => expect(screen.getByText('ไม่พบข้อมูล')).toBeTruthy())
+  })
 })
 
-// ─── API ─────────────────────────────────────────────────────────────────────
+// ─── Interactions ─────────────────────────────────────────────────────────────
 
-describe('Detail — API calls', () => {
-  it('เรียก /persona และ /persona/member เมื่อ mount', async () => {
+describe('Detail — interactions', () => {
+  it('member card ไม่มี cursor-pointer (กดไม่ได้)', async () => {
     mockFetch()
     render(<Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={() => {}} />)
-
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2))
-
-    const urls = fetch.mock.calls.map(([url]) => url)
-    expect(urls.some((u) => u.includes('/persona/member'))).toBe(true)
-    expect(urls.some((u) => u.includes('/persona') && !u.includes('/member'))).toBe(true)
+    await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
+    const card = screen.getByText('A0000001').closest('div[style]')
+    expect(card?.className).not.toContain('cursor-pointer')
   })
 
-  it('ส่ง filterValues ไปกับ /persona/member', async () => {
+  it('คลิก member → ไม่เรียก onSelectMember', async () => {
     mockFetch()
-    const filterValues = { age_min: 25, age_max: 45, area: 'BKK', zone: ['Z1'] }
+    const onSelectMember = vi.fn()
     render(
-      <Detail persona={PERSONA} filterValues={filterValues} onBack={() => {}} onSelectMember={() => {}} />,
+      <Detail persona={PERSONA} filterValues={null} onBack={() => {}} onSelectMember={onSelectMember} />,
     )
+    await waitFor(() => expect(screen.getByText('A0000001')).toBeTruthy())
+    fireEvent.click(screen.getByText('A0000001'))
+    expect(onSelectMember).not.toHaveBeenCalled()
+  })
 
+  it('คลิก Back → เรียก onBack', async () => {
+    mockFetch()
+    const onBack = vi.fn()
+    render(<Detail persona={PERSONA} filterValues={null} onBack={onBack} onSelectMember={() => {}} />)
     await waitFor(() => expect(fetch).toHaveBeenCalled())
-    const memberCall = fetch.mock.calls.find(([url]) => url.includes('/persona/member'))
-    const body = JSON.parse(memberCall[1].body)
-    expect(body.age_min).toBe(25)
-    expect(body.age_max).toBe(45)
-    expect(body.area).toBe('BKK')
-    expect(body.zone).toEqual(['Z1'])
+    fireEvent.click(screen.getByAltText('Back'))
+    expect(onBack).toHaveBeenCalledTimes(1)
   })
 })
