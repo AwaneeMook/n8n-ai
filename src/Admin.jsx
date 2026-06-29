@@ -102,6 +102,7 @@ export default function Admin({ onBack }) {
   });
   const [personaLoading, setPersonaLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [hoverVals, setHoverVals] = useState({ recruit: null, management: null, salesskill: null, technology: null });
 
   // Chat state
   const [messages, setMessages] = useState([
@@ -429,49 +430,59 @@ export default function Admin({ onBack }) {
                       {label}
                     </span>
                     <div
-                      className="flex items-center rounded-3xl bg-transparent overflow-visible flex-1"
+                      className="flex items-center rounded-3xl bg-transparent flex-1 px-3"
                       style={{ height: "44px", ...neonBorderStyle }}
                     >
-                      <div className="flex-shrink-0 flex items-center justify-center overflow-visible">
-                        <img
-                          src="/img/icon-star.png"
-                          alt=""
-                          className="object-contain"
-                          style={{
-                            height: "80px",
-                            marginLeft: "-20px",
-                            marginTop: "-45px",
-                            marginBottom: "-38px",
-                          }}
-                        />
+                      {/* Left: star icons */}
+                      <div
+                        className="flex items-center gap-1 flex-1"
+                        onMouseLeave={() => setHoverVals((h) => ({ ...h, [key]: null }))}
+                      >
+                        {Array.from({ length: 5 }).map((_, i) => {
+                          const hov = hoverVals[key];
+                          const filled = hov !== null ? i <= hov : i < (Number(attrValues[key]) || 0);
+                          return (
+                            <img
+                              key={i}
+                              src={filled ? "/img/detail/icon-star.png" : "/img/detail/icon-start-empty.png"}
+                              alt=""
+                              className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110"
+                              style={{ height: "22px", width: "22px" }}
+                              onMouseEnter={() => setHoverVals((h) => ({ ...h, [key]: i }))}
+                              onClick={() => {
+                                const next = { ...attrValues, [key]: i + 1 };
+                                setAttrValues(next);
+                                if (!initialLoad) callSaveAttr(next);
+                              }}
+                            />
+                          );
+                        })}
                       </div>
-                      <div className="flex flex-1 items-center justify-center pr-3">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={attrValues[key]}
-                          onChange={(e) => {
-                            const raw = e.target.value
-                              .replace(/\D/g, "")
-                              .slice(0, 1);
-                            // ไม่อัปเดต state ถ้าพิม 0 (แสดงค่าเดิมไว้)
-                            if (raw === "0") return;
-                            const next = { ...attrValues, [key]: raw };
-                            setAttrValues(next);
-                            if (!initialLoad) callSaveAttr(next);
-                          }}
-                          onBlur={(e) => {
-                            const val = Math.min(
-                              5,
-                              Math.max(1, Number(e.target.value) || 1),
-                            );
-                            const next = { ...attrValues, [key]: val };
-                            setAttrValues(next);
-                            if (!initialLoad) callSaveAttr(next);
-                          }}
-                          className="w-14 bg-transparent text-center text-xl font-bold text-white outline-none"
-                        />
-                      </div>
+                      {/* Right: number input */}
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={attrValues[key]}
+                        onChange={(e) => {
+                          const raw = e.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 1);
+                          if (raw === "0") return;
+                          const next = { ...attrValues, [key]: raw };
+                          setAttrValues(next);
+                          if (!initialLoad) callSaveAttr(next);
+                        }}
+                        onBlur={(e) => {
+                          const val = Math.min(
+                            5,
+                            Math.max(1, Number(e.target.value) || 1),
+                          );
+                          const next = { ...attrValues, [key]: val };
+                          setAttrValues(next);
+                          if (!initialLoad) callSaveAttr(next);
+                        }}
+                        className="w-8 bg-transparent text-center text-xl font-bold text-white outline-none flex-shrink-0"
+                      />
                     </div>
                   </div>
                 ))}
@@ -536,7 +547,7 @@ export default function Admin({ onBack }) {
                   <div
                     key={i}
                     ref={i === messages.length - 1 ? lastMsgRef : null}
-                    className={`flex items-end gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    className={`flex gap-3 ${msg.role === "user" ? "justify-end items-end" : "justify-start items-start"}`}
                   >
                     {msg.role !== "user" && (
                       <div className="flex flex-col items-center gap-1 flex-shrink-0">
