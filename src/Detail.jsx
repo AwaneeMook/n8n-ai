@@ -279,7 +279,7 @@ export default function Detail({
         </div>
 
         {/* ROW 2 — 3 blocks */}
-        <div className="relative z-20 flex flex-1 items-center pl-4 pr-2 pb-6 lg:pl-8 lg:pr-3 mt-4">
+        <div className="relative z-20 flex flex-1 items-center pl-4 pr-2 lg:pl-8 lg:pr-3 mt-4">
           <div className="grid w-full gap-x-4 lg:grid-cols-[440px_auto_0.85fr] items-stretch">
             {/* Block 1: Avatar */}
             <div className="flex items-center justify-center">
@@ -421,7 +421,8 @@ export default function Detail({
                     </span>
                   </div>
                   <div className="flex flex-nowrap gap-4 justify-center">
-                    {top3.slice(0, 3).map((product, idx) => (
+                    {/* top3 */}
+                    {["ab","ccc","ccc"].slice(0, 3).map((product, idx) => (
                       <div
                         key={product}
                         className="relative flex items-center justify-center"

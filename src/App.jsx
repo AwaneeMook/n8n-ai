@@ -179,10 +179,10 @@ export default function App() {
           <img
             src="/img/login-page.png"
             alt="Login Page"
-            className="object-none w-full h-full"
+            className="object-none w-full h-[90%]"
           />
         </div>
-        <div className="relative flex h-full items-center justify-center p-8 sm:p-10 md:p-14">
+        <div className="relative flex h-[90%] items-center justify-center p-8 sm:p-10 md:p-14">
           <div className="w-full max-w-[360px]">
             <div className="flex justify-center">
               <img

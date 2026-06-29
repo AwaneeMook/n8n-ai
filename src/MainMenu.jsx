@@ -29,7 +29,8 @@ export default function MainMenu({ onLogout, onBack, onSelect, onAdmin }) {
 
   useEffect(() => {
     const handleJson = (json) => {
-      const list = (json?.data ?? []).map((p) => {
+      // json?.data ?? []
+      const list = ([{key:"G01"},{key:"G02"},{key:"G03"},{key:"G05"},{key:"G07"},{key:"G08"},{key:"G10"}]).map((p) => {
         const key = p.key ?? p.bestgroup ?? "";
         return {
           key,
@@ -48,11 +49,13 @@ export default function MainMenu({ onLogout, onBack, onSelect, onAdmin }) {
       return;
     }
 
-    fetch(ALL_PERSONA_URL)
-      .then((r) => r.json())
-      .then(handleJson)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    handleJson()
+
+    // fetch(ALL_PERSONA_URL)
+    //   .then((r) => r.json())
+    //   .then(handleJson)
+    //   .catch(() => {})
+    //   .finally(() => setLoading(false));
   }, []);
 
   const rows = buildRows(personas);
@@ -79,7 +82,7 @@ export default function MainMenu({ onLogout, onBack, onSelect, onAdmin }) {
       </div>
 
       <div className="flex-1 w-full pb-32 px-4 z-10">
-        <div className="flex h-full w-full items-center justify-center">
+        <div className="flex h-[90%] w-full items-center justify-center">
           {loading ? (
             <div className="flex items-center justify-center">
               <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/30 border-t-white" />

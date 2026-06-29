@@ -387,8 +387,7 @@ export default function Admin({ onBack }) {
             <img
               src="/img/logo-admin.png"
               alt="Logo"
-              className="max-h-full object-contain object-top"
-              style={{ width: "90%", maxWidth: "90%" }}
+              className="object-contain object-top max-w-[90%] h-[90%]"
             />
           </div>
         </div>
@@ -521,7 +520,7 @@ export default function Admin({ onBack }) {
             {/* Row 2 — chat */}
             <div
               className="relative flex flex-col overflow-hidden flex-shrink-0"
-              style={{ height: "clamp(340px, 46vh, 600px)" }}
+              style={{ height: "clamp(320px, 46vh, 600px)" }}
             >
               <img
                 src="/img/chat/4.png"
