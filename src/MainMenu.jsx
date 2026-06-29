@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { clusterByKey } from "./data/clusterData";
 
-const ALL_PERSONA_URL =
-  "https://tli0107.candidsandbox.academy/webhook/all_persona";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://tli0107.candidsandbox.academy/webhook";
+const ALL_PERSONA_URL = `${API_BASE}/all_persona`;
 
 const KEY_TO_ID = { G01: 1, G02: 2, G03: 3, G05: 4, G07: 5, G08: 6, G10: 7 };
 const KEY_TO_LABEL = {

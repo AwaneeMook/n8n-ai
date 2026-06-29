@@ -5,7 +5,8 @@ import Detail from "./Detail";
 import Admin from "./Admin";
 import Chat from "./Chat";
 
-const LOGIN_URL = "https://tli0107.candidsandbox.academy/webhook/login";
+const API_BASE = import.meta.env.VITE_API_BASE || "https://tli0107.candidsandbox.academy/webhook";
+const LOGIN_URL = `${API_BASE}/login`;
 
 const loadFromSession = (key, fallback = null) => {
   try {
