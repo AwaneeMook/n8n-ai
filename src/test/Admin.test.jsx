@@ -114,7 +114,7 @@ describe('Admin — GlassDropdown', () => {
     fireEvent.click(toggle)
     fireEvent.click(screen.getByText('The Visionary'))
 
-    expect(screen.getByText('สวัสดี! มีอะไรให้ช่วยไหมครับ?')).toBeTruthy()
+    expect(screen.getByText('Welcome! How can I assist you on your mission today?')).toBeTruthy()
   })
 })
 

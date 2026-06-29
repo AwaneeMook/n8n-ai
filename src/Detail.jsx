@@ -422,7 +422,7 @@ export default function Detail({
                   </div>
                   <div className="flex flex-nowrap gap-4 justify-center">
                     {/* top3 */}
-                    {["ab","ccc","ccc"].slice(0, 3).map((product, idx) => (
+                    {top3.slice(0, 3).map((product, idx) => (
                       <div
                         key={product}
                         className="relative flex items-center justify-center"

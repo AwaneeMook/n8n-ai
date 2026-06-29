@@ -28,34 +28,28 @@ beforeEach(() => {
 // ─── Render ──────────────────────────────────────────────────────────────────
 
 describe('MainMenu — render', () => {
-  it('แสดง loading spinner ก่อน fetch เสร็จ', () => {
-    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})))
-    render(<MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />)
-    expect(document.querySelector('.animate-spin')).toBeTruthy()
-  })
-
-  it('แสดง persona cards หลัง fetch เสร็จ', async () => {
-    mockFetch()
+  it('แสดง persona cards ทั้ง 7 กลุ่ม', async () => {
     render(<MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />)
 
     await waitFor(() => expect(screen.getByText('The Commander')).toBeTruthy())
     expect(screen.getByText('The Visionary')).toBeTruthy()
     expect(screen.getByText('The Mentor')).toBeTruthy()
+    expect(screen.getByText('The Strategist')).toBeTruthy()
+    expect(screen.getByText('The Catalyst')).toBeTruthy()
   })
 
-  it('spinner หายหลัง fetch เสร็จ', async () => {
-    mockFetch()
+  it('spinner หายหลังโหลดเสร็จ', async () => {
     render(<MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />)
 
     await waitFor(() => expect(document.querySelector('.animate-spin')).toBeFalsy())
   })
 
-  it('fetch ล้มเหลว → ไม่แสดง persona cards', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Network')))
+  it('แสดง persona cards ครบ 7 รายการ', async () => {
     render(<MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />)
 
-    await waitFor(() => expect(document.querySelector('.animate-spin')).toBeFalsy())
-    expect(screen.queryByText('The Commander')).toBeFalsy()
+    await waitFor(() => expect(screen.getByText('The Commander')).toBeTruthy())
+    const labels = ['The Commander','The Visionary','The Moral Anchor','The Strategist','The Mentor','The Stabilizer','The Catalyst']
+    labels.forEach(label => expect(screen.getByText(label)).toBeTruthy())
   })
 })
 
@@ -109,23 +103,21 @@ describe('MainMenu — interactions', () => {
 // ─── Cache ────────────────────────────────────────────────────────────────────
 
 describe('MainMenu — cache', () => {
-  it('mount ครั้งแรก → เรียก /all_persona', async () => {
-    mockFetch()
+  it('mount ครั้งแรก → แสดงข้อมูลโดยไม่เรียก fetch', async () => {
+    vi.stubGlobal('fetch', vi.fn())
     render(<MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />)
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
-    expect(fetch.mock.calls[0][0]).toContain('all_persona')
+    await waitFor(() => expect(screen.getByText('The Commander')).toBeTruthy())
+    expect(fetch).not.toHaveBeenCalled()
   })
 
-  it('mount ครั้งที่สอง (cache hit) → ไม่เรียก fetch อีก', async () => {
-    mockFetch()
+  it('mount ครั้งที่สอง (cache hit) → ยังแสดงข้อมูลได้', async () => {
     const { unmount } = render(
       <MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />,
     )
     await waitFor(() => expect(screen.getByText('The Commander')).toBeTruthy())
     unmount()
 
-    vi.restoreAllMocks()
     vi.stubGlobal('fetch', vi.fn())
 
     render(<MainMenu onLogout={() => {}} onBack={() => {}} onSelect={() => {}} onAdmin={() => {}} />)
