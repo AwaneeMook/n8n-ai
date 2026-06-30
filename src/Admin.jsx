@@ -256,15 +256,23 @@ export default function Admin({ onBack }) {
     const text = input.trim();
     if (!text || chatLoading) return;
     setInput("");
-    sendChat(text, CHAT_URL, { personId: persona?.key ?? "", prompt: text });
+    sendChat(text, CHAT_URL, { personId: persona?.label ?? "", prompt: text });
   };
 
-  const buildAdminQuickPayload = (promptText) => {
-    const attibute =
-      `Recruit ${resolveCriteria("recruit", attrValues.recruit)} ` +
-      `Management ${resolveCriteria("management", attrValues.management)} ` +
-      `Sales Skills ${resolveCriteria("salesskill", attrValues.salesskill)} ` +
-      `Technology ${resolveCriteria("technology", attrValues.technology)}`;
+  const ATTR_LABEL = {
+    recruit: "Recruit",
+    management: "Management",
+    salesskill: "Sales Skills",
+    technology: "Technology",
+  };
+
+  const buildAdminQuickPayload = (promptText, attrKey = null) => {
+    const attibute = attrKey
+      ? `${ATTR_LABEL[attrKey]} ${resolveCriteria(attrKey, attrValues[attrKey])}`
+      : `Recruit ${resolveCriteria("recruit", attrValues.recruit)} ` +
+        `Management ${resolveCriteria("management", attrValues.management)} ` +
+        `Sales Skills ${resolveCriteria("salesskill", attrValues.salesskill)} ` +
+        `Technology ${resolveCriteria("technology", attrValues.technology)}`;
     return {
       prompt: promptText,
       custer: persona?.label ?? "",
@@ -272,8 +280,8 @@ export default function Admin({ onBack }) {
     };
   };
 
-  const handleQuickPrompt = (promptText) => {
-    const payload = buildAdminQuickPayload(promptText);
+  const handleQuickPrompt = (promptText, attrKey = null) => {
+    const payload = buildAdminQuickPayload(promptText, attrKey);
     sendChat(promptText, CHAT_QUICK_URL, payload);
   };
 
@@ -497,23 +505,27 @@ export default function Admin({ onBack }) {
                     {
                       label: "วิเคราะห์ด้าน Recruit",
                       img: "/img/chat/icon-chat-1.png",
+                      attrKey: "recruit",
                     },
                     {
                       label: "วิเคราะห์ด้าน Management",
                       img: "/img/chat/icon-chat-2.png",
+                      attrKey: "management",
                     },
                     {
                       label: "วิเคราะห์ด้าน Sales Skills",
                       img: "/img/chat/icon-chat-3.png",
+                      attrKey: "salesskill",
                     },
                     {
                       label: "วิเคราะห์ด้าน Technology",
                       img: "/img/chat/icon-chat-4.png",
+                      attrKey: "technology",
                     },
                   ].map((p) => (
                     <button
                       key={p.label}
-                      onClick={() => handleQuickPrompt(p.label)}
+                      onClick={() => handleQuickPrompt(p.label, p.attrKey)}
                       disabled={chatLoading}
                       className="flex flex-row items-center gap-2 rounded-lg border border-sky-400/40 bg-sky-500/10 px-2.5 py-2 text-left text-xs font-medium text-white transition hover:bg-sky-500/25 hover:border-sky-400 active:scale-95 disabled:opacity-50"
                     >

@@ -178,8 +178,8 @@ export default function Chat({
     setLoading(true);
     try {
       const body = customBody ?? {
-        // เลือก member → personId ของคนนั้น | ไม่เลือก → key ของ persona ที่เลือกอยู่ (G01/G02/...)
-        personId: personId || persona?.key || "G01",
+        // เลือก member → personId ของคนนั้น | ไม่เลือก → label ของ persona (เช่น "The Mentor")
+        personId: personId || persona?.label || "",
         prompt: apiPrompt,
       };
       const res = await fetch(endpoint, {
