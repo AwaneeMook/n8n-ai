@@ -66,11 +66,11 @@ function buildDisplayText(attrKey, personaKey) {
     `- อาชีพหลัก = ${stats.mainOccupation.join(", ")}`,
     `- ช่วงอายุ = ${stats.ageRange.join(", ")} ปี`,
   ].join("\n");
+  const starWord = (i) => `${i + 1}Star${i === 0 ? "" : "s"}`;
   const scoring = groupScoring
     .map((m) => {
-      const starLabels = ["1★", "2★★", "3★★★", "4★★★★", "5★★★★★"];
-      const ranges = m.stars.map((r, i) => `${starLabels[i]}=${r}`).join("  ");
-      return `  ${m.label}:\n    ${ranges}`;
+      const sub = m.stars.map((r, i) => `  - ${r} = ${starWord(i)}`).join("\n");
+      return `- ${m.label}:\n${sub}`;
     })
     .join("\n");
   return `วิเคราะห์ด้าน ${dimension} จากข้อมูล\n\n${data}\n\nเกณฑ์การให้ดาว:\n${scoring}`;
