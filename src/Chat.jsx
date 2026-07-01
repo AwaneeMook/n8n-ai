@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { buildQuickPayload } from "./data/promptBuilders";
 import { cleanHtml } from "./utils/cleanHtml";
 
+// soft black backdrop that fades out at the edges to blend with the page
+const blockBg = {
+  background:
+    "radial-gradient(ellipse at center, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0) 100%)",
+};
+
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
   "https://tli0107.candidsandbox.academy/webhook";
@@ -537,7 +543,7 @@ export default function Chat({
             {/* Block 1 — head image with frame */}
             <div
               className="relative flex items-center justify-center flex-shrink-0 mx-3"
-              style={{ width: "70px", height: "70px" }}
+              style={{ width: "70px", height: "70px", ...blockBg }}
             >
               <img
                 src="/img/detail/footer/dashboard.png"
@@ -565,7 +571,10 @@ export default function Chat({
             </div>
 
             {/* Block 2 — profile info */}
-            <div className="relative flex-1 flex flex-col justify-center gap-1 pl-2">
+            <div
+              className="relative flex-1 flex flex-col justify-center gap-1 pl-2"
+              style={blockBg}
+            >
               <span className="text-xs text-sky-200/80 font-semibold tracking-widest uppercase">
                 Your Ranger Profile
               </span>
@@ -587,7 +596,7 @@ export default function Chat({
             {/* Block 3 — Attribute */}
             <div
               className="relative flex flex-col justify-center gap-0.5 pr-16 flex-shrink-0"
-              style={{ minWidth: "180px" }}
+              style={{ minWidth: "180px", ...blockBg }}
             >
               {(() => {
                 const a = activePersonaData?.attribute;
