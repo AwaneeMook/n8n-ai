@@ -691,7 +691,7 @@ export default function Admin({ onBack }) {
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
                           }}
-                          className="w-12 flex-shrink-0 rounded-2xl bg-white/[0.03] text-center text-lg font-bold text-white outline-none transition"
+                          className="w-12 flex-shrink-0 rounded-2xl bg-white/[0.03] text-center text-lg font-bold text-white outline-none transition focus:bg-sky-500/25 focus:ring-2 focus:ring-sky-400"
                           style={{ height: "48px", ...neonBorderStyle }}
                         />
                       </div>
