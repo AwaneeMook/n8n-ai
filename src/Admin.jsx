@@ -618,9 +618,9 @@ export default function Admin({ onBack }) {
               </div>
             </div>
             {/* Col right — Stars + Quick Prompts */}
-            <div className="w-[40%] flex-shrink-0 flex flex-col min-h-0">
+            <div className="w-[30%] flex-shrink-0 flex flex-col min-h-0">
               {/* Stars form — expands to fill space */}
-              <div className="flex-1 flex flex-col justify-around py-4 px-2 min-h-0">
+              <div className="flex-1 flex flex-col justify-around py-4 min-h-0">
                 {[
                   { key: "recruit", label: "Recruit" },
                   { key: "management", label: "Management" },
@@ -631,7 +631,7 @@ export default function Admin({ onBack }) {
                   return (
                     <div key={key} className="flex flex-col gap-1.5">
                       <div className="flex items-center justify-between px-1">
-                        <span className="text-sm font-bold uppercase tracking-wide text-sky-100">
+                        <span className="text-sm font-bold uppercase tracking-wide text-sky-400">
                           {label}
                         </span>
                         <span className="text-xs font-bold text-sky-300/80">
@@ -647,8 +647,7 @@ export default function Admin({ onBack }) {
                       >
                         {Array.from({ length: 5 }).map((_, i) => {
                           const hov = hoverVals[key];
-                          const filled =
-                            hov !== null ? i <= hov : i < score;
+                          const filled = hov !== null ? i <= hov : i < score;
                           return (
                             <img
                               key={i}
@@ -678,7 +677,7 @@ export default function Admin({ onBack }) {
               </div>
 
               {/* Quick Prompts — pinned to bottom */}
-              <div className="flex flex-col gap-2 px-2 pb-4">
+              <div className="flex flex-col gap-2 pb-4">
                 <div className="text-xs font-bold tracking-widest text-sky-400 uppercase px-1">
                   Quick Prompts
                 </div>
