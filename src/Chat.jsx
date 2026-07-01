@@ -287,7 +287,11 @@ export default function Chat({
 
   return (
     <div className="relative h-screen w-screen flex flex-col text-white overflow-hidden">
-      <div className="fixed inset-0 z-0 bg-black" />
+      <img
+        src="/img/chat-bg.png"
+        alt=""
+        className="fixed inset-0 z-0 h-full w-full object-cover"
+      />
 
       {bootLoading && (
         <div className="absolute inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
