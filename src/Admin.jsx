@@ -629,7 +629,7 @@ export default function Admin({ onBack }) {
                 ].map(({ key, label }) => {
                   const score = Number(attrValues[key]) || 0;
                   return (
-                    <div key={key} className="flex flex-col gap-1.5">
+                    <div key={key} className="flex flex-col gap-2">
                       <span className="px-1 text-sm font-bold uppercase tracking-wide text-sky-400">
                         {label}
                       </span>
