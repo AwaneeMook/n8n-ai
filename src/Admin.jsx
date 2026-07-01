@@ -633,12 +633,11 @@ export default function Admin({ onBack }) {
                       <span className="px-1 text-sm font-bold uppercase tracking-wide text-sky-400">
                         {label}
                       </span>
-                      <div
-                        className="flex items-center overflow-hidden rounded-2xl bg-white/[0.03] pl-3"
-                        style={{ height: "48px", ...neonBorderStyle }}
-                      >
+                      <div className="flex items-center gap-2">
+                        {/* Stars box */}
                         <div
-                          className="flex items-center gap-2 flex-1"
+                          className="flex items-center gap-2 flex-1 rounded-2xl bg-white/[0.03] px-3"
+                          style={{ height: "48px", ...neonBorderStyle }}
                           onMouseLeave={() =>
                             setHoverVals((h) => ({ ...h, [key]: null }))
                           }
@@ -669,6 +668,7 @@ export default function Admin({ onBack }) {
                             );
                           })}
                         </div>
+                        {/* Input box */}
                         <input
                           type="text"
                           inputMode="numeric"
@@ -691,8 +691,8 @@ export default function Admin({ onBack }) {
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
                           }}
-                          className="ml-3 h-full w-11 flex-shrink-0 bg-transparent text-center text-lg font-bold text-white outline-none transition"
-                          style={{ borderLeft: "1.5px solid #3366dd" }}
+                          className="w-12 flex-shrink-0 rounded-2xl bg-white/[0.03] text-center text-lg font-bold text-white outline-none transition"
+                          style={{ height: "48px", ...neonBorderStyle }}
                         />
                       </div>
                     </div>
