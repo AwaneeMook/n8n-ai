@@ -691,7 +691,7 @@ export default function Admin({ onBack }) {
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
                           }}
-                          className="ml-3 h-full w-11 flex-shrink-0 bg-transparent text-center text-lg font-bold text-white outline-none transition"
+                          className="ml-3 h-full w-11 flex-shrink-0 rounded-r-2xl bg-sky-500/10 text-center text-lg font-bold text-white outline-none transition focus:bg-sky-500/20"
                           style={{ borderLeft: "1.5px solid #3366dd" }}
                         />
                       </div>
