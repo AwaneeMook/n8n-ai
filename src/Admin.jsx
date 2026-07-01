@@ -669,6 +669,7 @@ export default function Admin({ onBack }) {
                             );
                           })}
                         </div>
+                        <div className="ml-1 mr-2 h-6 w-px flex-shrink-0 bg-sky-400/50" />
                         <input
                           type="text"
                           inputMode="numeric"
