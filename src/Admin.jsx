@@ -471,7 +471,7 @@ export default function Admin({ onBack }) {
             </div>
           </div>
           {/* Bottom: logo */}
-          <div className="flex-1 flex items-end justify-center pb-6 mt-2 min-h-0">
+          <div className="flex-1 flex items-center justify-center py-4 min-h-0">
             <img
               src="/img/logo-admin.png"
               alt="Logo"
