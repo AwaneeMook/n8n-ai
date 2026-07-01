@@ -619,8 +619,8 @@ export default function Admin({ onBack }) {
             </div>
             {/* Col right — Stars + Quick Prompts */}
             <div className="w-[30%] flex-shrink-0 flex flex-col min-h-0">
-              {/* Stars form — expands to fill space */}
-              <div className="flex-1 flex flex-col justify-between pt-0 pb-4 min-h-0">
+              {/* Stars form */}
+              <div className="flex flex-col gap-3 pt-0 pb-4">
                 {[
                   { key: "recruit", label: "Recruit" },
                   { key: "management", label: "Management" },
@@ -701,7 +701,7 @@ export default function Admin({ onBack }) {
 
               {/* Quick Prompts — pinned to bottom */}
               <div className="flex flex-col gap-2 pb-4">
-                <div className="text-xs font-bold tracking-widest text-sky-400 uppercase px-1">
+                <div className="text-xs font-bold tracking-widest pt-4 text-sky-400 uppercase px-1">
                   Quick Prompts
                 </div>
                 <div className="flex flex-col gap-2">
