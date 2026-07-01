@@ -3,10 +3,8 @@ import { buildQuickPayload } from "./data/promptBuilders";
 import { cleanHtml } from "./utils/cleanHtml";
 
 // soft black backdrop that fades out at the edges to blend with the page
-const blockBg = {
-  background:
-    "radial-gradient(ellipse at center, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0) 100%)",
-};
+const columnBgGradient =
+  "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 100%)";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
@@ -313,9 +311,9 @@ export default function Chat({
           style={{
             width: "25%",
             minWidth: "230px",
-            backgroundImage: "url('/img/chat/1.png')",
-            backgroundSize: "100% 100%",
-            backgroundRepeat: "no-repeat",
+            backgroundImage: `url('/img/chat/1.png'), ${columnBgGradient}`,
+            backgroundSize: "100% 100%, 100% 100%",
+            backgroundRepeat: "no-repeat, no-repeat",
           }}
         >
           {/* Row top — logo frame */}
@@ -452,7 +450,10 @@ export default function Chat({
         </div>
 
         {/* CENTER — Chat */}
-        <div className="flex flex-col flex-1 overflow-hidden">
+        <div
+          className="flex flex-col flex-1 overflow-hidden"
+          style={{ backgroundImage: columnBgGradient }}
+        >
           {/* Row 1 — profile info (no bg) */}
           <div
             className="flex-shrink-0 relative flex items-center gap-2 py-3"
@@ -543,7 +544,7 @@ export default function Chat({
             {/* Block 1 — head image with frame */}
             <div
               className="relative flex items-center justify-center flex-shrink-0 mx-3"
-              style={{ width: "70px", height: "70px", ...blockBg }}
+              style={{ width: "70px", height: "70px" }}
             >
               <img
                 src="/img/detail/footer/dashboard.png"
@@ -571,10 +572,7 @@ export default function Chat({
             </div>
 
             {/* Block 2 — profile info */}
-            <div
-              className="relative flex-1 flex flex-col justify-center gap-1 pl-2"
-              style={blockBg}
-            >
+            <div className="relative flex-1 flex flex-col justify-center gap-1 pl-2">
               <span className="text-xs text-sky-200/80 font-semibold tracking-widest uppercase">
                 Your Ranger Profile
               </span>
@@ -596,7 +594,7 @@ export default function Chat({
             {/* Block 3 — Attribute */}
             <div
               className="relative flex flex-col justify-center gap-0.5 pr-16 flex-shrink-0"
-              style={{ minWidth: "180px", ...blockBg }}
+              style={{ minWidth: "180px" }}
             >
               {(() => {
                 const a = activePersonaData?.attribute;
@@ -777,9 +775,9 @@ export default function Chat({
           style={{
             width: "27%",
             minWidth: "240px",
-            backgroundImage: "url('/img/chat/1.png')",
-            backgroundSize: "100% 100%",
-            backgroundRepeat: "no-repeat",
+            backgroundImage: `url('/img/chat/1.png'), ${columnBgGradient}`,
+            backgroundSize: "100% 100%, 100% 100%",
+            backgroundRepeat: "no-repeat, no-repeat",
           }}
         >
           {/* Top Persona Match banner + Back */}
