@@ -496,149 +496,10 @@ export default function Admin({ onBack }) {
               Attribute Analysis Setting
             </h2>
           </div>
-          <div className="w-full flex flex-col gap-4 flex-1 overflow-hidden">
-            {/* Row 1 */}
-            <div
-              className="grid gap-0 flex-shrink-0"
-              style={{ gridTemplateColumns: "60% 40%", height: "240px" }}
-            >
-              {/* Col left — form */}
-              <div className="relative flex flex-col gap-3 rounded-2xl py-2 px-4 overflow-visible justify-center">
-                {[
-                  { key: "recruit", label: "Recruit" },
-                  { key: "management", label: "Management" },
-                  { key: "salesskill", label: "Sales Skills" },
-                  { key: "technology", label: "Technology" },
-                ].map(({ key, label }) => (
-                  <div
-                    key={key}
-                    className="relative z-10 flex items-center gap-4"
-                  >
-                    <span className="w-40 shrink-0 text-right text-xl font-bold text-white">
-                      {label}
-                    </span>
-                    <div
-                      className="flex items-center rounded-3xl bg-transparent flex-1 px-3"
-                      style={{ height: "44px", ...neonBorderStyle }}
-                    >
-                      {/* Left: star icons */}
-                      <div
-                        className="flex items-center gap-1 flex-1"
-                        onMouseLeave={() =>
-                          setHoverVals((h) => ({ ...h, [key]: null }))
-                        }
-                      >
-                        {Array.from({ length: 5 }).map((_, i) => {
-                          const hov = hoverVals[key];
-                          const filled =
-                            hov !== null
-                              ? i <= hov
-                              : i < (Number(attrValues[key]) || 0);
-                          return (
-                            <img
-                              key={i}
-                              src={
-                                filled
-                                  ? "/img/detail/icon-star.png"
-                                  : "/img/detail/icon-start-empty.png"
-                              }
-                              alt=""
-                              className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110"
-                              style={{ height: "22px", width: "22px" }}
-                              onMouseEnter={() =>
-                                setHoverVals((h) => ({ ...h, [key]: i }))
-                              }
-                              onClick={() => {
-                                const next = { ...attrValues, [key]: i + 1 };
-                                setAttrValues(next);
-                                if (!initialLoad) callSaveAttr(next);
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                      {/* Right: number input */}
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={attrValues[key]}
-                        onChange={(e) => {
-                          const raw = e.target.value
-                            .replace(/\D/g, "")
-                            .slice(0, 1);
-                          if (raw === "0") return;
-                          const next = { ...attrValues, [key]: raw };
-                          setAttrValues(next);
-                          if (!initialLoad) callSaveAttr(next);
-                        }}
-                        onBlur={(e) => {
-                          const val = Math.min(
-                            5,
-                            Math.max(1, Number(e.target.value) || 1),
-                          );
-                          const next = { ...attrValues, [key]: val };
-                          setAttrValues(next);
-                          if (!initialLoad) callSaveAttr(next);
-                        }}
-                        className="w-8 bg-transparent text-center text-xl font-bold text-white outline-none flex-shrink-0"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* Col right — Quick Prompts */}
-              <div className="flex flex-col gap-2 px-3 py-2 justify-center">
-                <div className="text-xs font-bold tracking-widest text-sky-400 uppercase mb-1 px-2">
-                  Quick Prompts
-                </div>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    {
-                      label: "วิเคราะห์ด้าน Recruit",
-                      img: "/img/chat/icon-chat-1.png",
-                      attrKey: "recruit",
-                    },
-                    {
-                      label: "วิเคราะห์ด้าน Management",
-                      img: "/img/chat/icon-chat-2.png",
-                      attrKey: "management",
-                    },
-                    {
-                      label: "วิเคราะห์ด้าน Sales Skills",
-                      img: "/img/chat/icon-chat-3.png",
-                      attrKey: "salesskill",
-                    },
-                    {
-                      label: "วิเคราะห์ด้าน Technology",
-                      img: "/img/chat/icon-chat-4.png",
-                      attrKey: "technology",
-                    },
-                  ].map((p) => (
-                    <button
-                      key={p.label}
-                      onClick={() => handleQuickPrompt(p.label, p.attrKey)}
-                      disabled={chatLoading}
-                      className="flex flex-row items-center gap-2 rounded-lg border border-sky-400/40 bg-sky-500/10 px-2.5 py-2 text-left text-xs font-medium text-white transition hover:bg-sky-500/25 hover:border-sky-400 active:scale-95 disabled:opacity-50"
-                    >
-                      <img
-                        src={p.img}
-                        alt=""
-                        className="h-6 w-6 object-contain flex-shrink-0"
-                      />
-                      <span className="leading-snug">{p.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {/* Row 2 — chat */}
-            <div
-              className="relative flex flex-col overflow-hidden"
-              style={{
-                minHeight: "320px",
-                height: "clamp(320px, 46vh, 600px)",
-              }}
-            >
+          <div className="w-full flex flex-row gap-3 flex-1 overflow-hidden pt-2">
+
+            {/* Col left — Chat */}
+            <div className="flex-1 relative flex flex-col overflow-hidden min-h-0">
               <img
                 src="/img/chat/4.png"
                 alt=""
@@ -646,7 +507,7 @@ export default function Admin({ onBack }) {
               />
               <div
                 ref={chatScrollRef}
-                className="relative flex-1 overflow-y-auto flex flex-col gap-4"
+                className="relative flex-1 overflow-y-auto flex flex-col gap-4 min-h-0"
                 style={{ margin: "16px 20px 8px 20px", padding: "0 8px" }}
               >
                 {messages.map((msg, i) => (
@@ -664,32 +525,25 @@ export default function Admin({ onBack }) {
                         />
                       </div>
                     )}
-                    <div className="flex flex-col gap-1 max-w-[70%]">
+                    <div className="flex flex-col gap-1 max-w-[75%]">
                       {msg.role !== "user" && (
                         <span className="text-xs font-bold text-sky-400 ml-1">
-                          {persona?.label?.toUpperCase().replace("THE ", "") +
-                            " AI" || "AI"}
+                          {persona?.label?.toUpperCase().replace("THE ", "") + " AI" || "AI"}
                         </span>
                       )}
                       <div
-                        className={`rounded-2xl px-5 py-3 text-sm font-medium leading-relaxed ${msg.role === "user" ? "bg-sky-600 text-white rounded-br-sm" : "bg-white/10 backdrop-blur-sm text-white rounded-bl-sm border border-white/20"}`}
+                        className={`rounded-2xl px-4 py-3 text-sm font-medium leading-relaxed ${msg.role === "user" ? "bg-sky-600 text-white rounded-br-sm" : "bg-white/10 backdrop-blur-sm text-white rounded-bl-sm border border-white/20"}`}
                       >
                         {msg.role === "user" ? (
-                          <span className="whitespace-pre-wrap">
-                            {msg.text}
-                          </span>
+                          <span className="whitespace-pre-wrap">{msg.text}</span>
                         ) : (
                           <div
                             className="prose prose-invert prose-sm max-w-none [&_li]:my-1 [&_ul]:my-2 [&_p]:my-1 [&_p:empty]:hidden"
-                            dangerouslySetInnerHTML={{
-                              __html: cleanHtml(msg.text),
-                            }}
+                            dangerouslySetInnerHTML={{ __html: cleanHtml(msg.text) }}
                           />
                         )}
                         {msg.time && (
-                          <div className="text-right text-xs text-white/40 mt-1">
-                            {msg.time}
-                          </div>
+                          <div className="text-right text-xs text-white/40 mt-1">{msg.time}</div>
                         )}
                       </div>
                       {msg.suggestions?.length > 0 && (
@@ -710,29 +564,16 @@ export default function Admin({ onBack }) {
                 ))}
                 {chatLoading && (
                   <div className="flex items-end gap-3 justify-start">
-                    <img
-                      src="/img/chat/11.png"
-                      alt="AI"
-                      className="h-10 w-10 object-contain flex-shrink-0 mb-1"
-                    />
+                    <img src="/img/chat/11.png" alt="AI" className="h-10 w-10 object-contain flex-shrink-0 mb-1" />
                     <div className="bg-white/10 border border-white/20 rounded-2xl rounded-bl-sm px-5 py-3 flex gap-1 items-center">
-                      <span
-                        className="h-2 w-2 rounded-full bg-sky-400 animate-bounce"
-                        style={{ animationDelay: "0ms" }}
-                      />
-                      <span
-                        className="h-2 w-2 rounded-full bg-sky-400 animate-bounce"
-                        style={{ animationDelay: "150ms" }}
-                      />
-                      <span
-                        className="h-2 w-2 rounded-full bg-sky-400 animate-bounce"
-                        style={{ animationDelay: "300ms" }}
-                      />
+                      <span className="h-2 w-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: "0ms" }} />
+                      <span className="h-2 w-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: "150ms" }} />
+                      <span className="h-2 w-2 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: "300ms" }} />
                     </div>
                   </div>
                 )}
               </div>
-              <div className="relative px-10 py-4 pb-6 flex gap-3 items-end">
+              <div className="relative px-6 py-3 pb-5 flex gap-3 items-end">
                 <textarea
                   rows={1}
                   value={input}
@@ -748,15 +589,101 @@ export default function Admin({ onBack }) {
                   disabled={!input.trim() || chatLoading}
                   className="flex-shrink-0 transition hover:scale-110 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <img
-                    src="/img/chat/5.png"
-                    alt="Send"
-                    className="object-contain"
-                    style={{ height: "48px", width: "48px" }}
-                  />
+                  <img src="/img/chat/5.png" alt="Send" className="object-contain" style={{ height: "48px", width: "48px" }} />
                 </button>
               </div>
             </div>
+
+            {/* Col right — Stars (top) + Quick Prompts (bottom) */}
+            <div className="w-[38%] flex-shrink-0 flex flex-col gap-3">
+              {/* Stars form */}
+              <div className="flex flex-col gap-3 py-2 px-2">
+                {[
+                  { key: "recruit", label: "Recruit" },
+                  { key: "management", label: "Management" },
+                  { key: "salesskill", label: "Sales Skills" },
+                  { key: "technology", label: "Technology" },
+                ].map(({ key, label }) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <span className="w-28 shrink-0 text-right text-sm font-bold text-white">{label}</span>
+                    <div
+                      className="flex items-center rounded-3xl bg-transparent flex-1 px-2"
+                      style={{ height: "40px", ...neonBorderStyle }}
+                    >
+                      <div
+                        className="flex items-center gap-1 flex-1"
+                        onMouseLeave={() => setHoverVals((h) => ({ ...h, [key]: null }))}
+                      >
+                        {Array.from({ length: 5 }).map((_, i) => {
+                          const hov = hoverVals[key];
+                          const filled = hov !== null ? i <= hov : i < (Number(attrValues[key]) || 0);
+                          return (
+                            <img
+                              key={i}
+                              src={filled ? "/img/detail/icon-star.png" : "/img/detail/icon-start-empty.png"}
+                              alt=""
+                              className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110"
+                              style={{ height: "20px", width: "20px" }}
+                              onMouseEnter={() => setHoverVals((h) => ({ ...h, [key]: i }))}
+                              onClick={() => {
+                                const next = { ...attrValues, [key]: i + 1 };
+                                setAttrValues(next);
+                                if (!initialLoad) callSaveAttr(next);
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={attrValues[key]}
+                        onChange={(e) => {
+                          const raw = e.target.value.replace(/\D/g, "").slice(0, 1);
+                          if (raw === "0") return;
+                          const next = { ...attrValues, [key]: raw };
+                          setAttrValues(next);
+                          if (!initialLoad) callSaveAttr(next);
+                        }}
+                        onBlur={(e) => {
+                          const val = Math.min(5, Math.max(1, Number(e.target.value) || 1));
+                          const next = { ...attrValues, [key]: val };
+                          setAttrValues(next);
+                          if (!initialLoad) callSaveAttr(next);
+                        }}
+                        className="w-6 bg-transparent text-center text-base font-bold text-white outline-none flex-shrink-0"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Quick Prompts */}
+              <div className="flex flex-col gap-2 px-2">
+                <div className="text-xs font-bold tracking-widest text-sky-400 uppercase px-1">
+                  Quick Prompts
+                </div>
+                <div className="flex flex-col gap-2">
+                  {[
+                    { label: "วิเคราะห์ด้าน Recruit", img: "/img/chat/icon-chat-1.png", attrKey: "recruit" },
+                    { label: "วิเคราะห์ด้าน Management", img: "/img/chat/icon-chat-2.png", attrKey: "management" },
+                    { label: "วิเคราะห์ด้าน Sales Skills", img: "/img/chat/icon-chat-3.png", attrKey: "salesskill" },
+                    { label: "วิเคราะห์ด้าน Technology", img: "/img/chat/icon-chat-4.png", attrKey: "technology" },
+                  ].map((p) => (
+                    <button
+                      key={p.label}
+                      onClick={() => handleQuickPrompt(p.label, p.attrKey)}
+                      disabled={chatLoading}
+                      className="flex flex-row items-center gap-2 rounded-lg border border-sky-400/40 bg-sky-500/10 px-2.5 py-2 text-left text-xs font-medium text-white transition hover:bg-sky-500/25 hover:border-sky-400 active:scale-95 disabled:opacity-50"
+                    >
+                      <img src={p.img} alt="" className="h-5 w-5 object-contain flex-shrink-0" />
+                      <span className="leading-snug">{p.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
