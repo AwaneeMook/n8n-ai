@@ -428,7 +428,7 @@ export default function Admin({ onBack }) {
 
       <div className="relative z-10 w-full flex flex-col lg:flex-row pt-0 px-6 lg:px-12 flex-1 min-h-0">
         {/* Left 40% */}
-        <div className="w-full lg:w-[40%] flex flex-col items-center lg:self-stretch min-h-0 overflow-y-auto">
+        <div className="w-full lg:w-[28%] flex flex-col items-center lg:self-stretch min-h-0 overflow-y-auto">
           {/* Top: form */}
           <div className="px-6 pb-6 pt-0 flex flex-col justify-center gap-4 items-center w-full mt-12">
             <div className="w-full max-w-[400px]">
@@ -482,7 +482,7 @@ export default function Admin({ onBack }) {
         </div>
 
         {/* Right 60% */}
-        <div className="w-full lg:w-[60%] flex flex-col relative z-10 min-h-0">
+        <div className="w-full lg:w-[72%] flex flex-col relative z-10 min-h-0">
           <div
             className="relative flex-shrink-0 flex items-center justify-center pl-6"
             style={{ height: "115px" }}
