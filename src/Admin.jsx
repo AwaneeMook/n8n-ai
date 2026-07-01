@@ -620,7 +620,7 @@ export default function Admin({ onBack }) {
             {/* Col right — Stars + Quick Prompts */}
             <div className="w-[30%] flex-shrink-0 flex flex-col min-h-0">
               {/* Stars form — expands to fill space */}
-              <div className="flex-1 flex flex-col justify-between pt-4 pb-4 min-h-0">
+              <div className="flex-1 flex flex-col justify-between pt-0 pb-4 min-h-0">
                 {[
                   { key: "recruit", label: "Recruit" },
                   { key: "management", label: "Management" },
@@ -630,46 +630,69 @@ export default function Admin({ onBack }) {
                   const score = Number(attrValues[key]) || 0;
                   return (
                     <div key={key} className="flex flex-col gap-1.5">
-                      <div className="flex items-center justify-between px-1">
-                        <span className="text-sm font-bold uppercase tracking-wide text-sky-400">
-                          {label}
-                        </span>
-                        <span className="text-xs font-bold text-sky-300/80">
-                          {score}/5
-                        </span>
-                      </div>
+                      <span className="px-1 text-sm font-bold uppercase tracking-wide text-sky-400">
+                        {label}
+                      </span>
                       <div
-                        className="flex items-center justify-center gap-2.5 rounded-2xl bg-white/[0.03] px-4"
+                        className="flex items-center rounded-2xl bg-white/[0.03] px-4"
                         style={{ height: "48px", ...neonBorderStyle }}
-                        onMouseLeave={() =>
-                          setHoverVals((h) => ({ ...h, [key]: null }))
-                        }
                       >
-                        {Array.from({ length: 5 }).map((_, i) => {
-                          const hov = hoverVals[key];
-                          const filled = hov !== null ? i <= hov : i < score;
-                          return (
-                            <img
-                              key={i}
-                              src={
-                                filled
-                                  ? "/img/detail/icon-star.png"
-                                  : "/img/detail/icon-start-empty.png"
-                              }
-                              alt=""
-                              className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-125"
-                              style={{ height: "24px", width: "24px" }}
-                              onMouseEnter={() =>
-                                setHoverVals((h) => ({ ...h, [key]: i }))
-                              }
-                              onClick={() => {
-                                const next = { ...attrValues, [key]: i + 1 };
-                                setAttrValues(next);
-                                if (!initialLoad) callSaveAttr(next);
-                              }}
-                            />
-                          );
-                        })}
+                        <div
+                          className="flex items-center gap-2 flex-1"
+                          onMouseLeave={() =>
+                            setHoverVals((h) => ({ ...h, [key]: null }))
+                          }
+                        >
+                          {Array.from({ length: 5 }).map((_, i) => {
+                            const hov = hoverVals[key];
+                            const filled = hov !== null ? i <= hov : i < score;
+                            return (
+                              <img
+                                key={i}
+                                src={
+                                  filled
+                                    ? "/img/detail/icon-star.png"
+                                    : "/img/detail/icon-start-empty.png"
+                                }
+                                alt=""
+                                className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-125"
+                                style={{ height: "24px", width: "24px" }}
+                                onMouseEnter={() =>
+                                  setHoverVals((h) => ({ ...h, [key]: i }))
+                                }
+                                onClick={() => {
+                                  const next = { ...attrValues, [key]: i + 1 };
+                                  setAttrValues(next);
+                                  if (!initialLoad) callSaveAttr(next);
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          value={attrValues[key]}
+                          onChange={(e) => {
+                            const raw = e.target.value
+                              .replace(/\D/g, "")
+                              .slice(0, 1);
+                            if (raw === "0") return;
+                            const next = { ...attrValues, [key]: raw };
+                            setAttrValues(next);
+                            if (!initialLoad) callSaveAttr(next);
+                          }}
+                          onBlur={(e) => {
+                            const val = Math.min(
+                              5,
+                              Math.max(1, Number(e.target.value) || 1),
+                            );
+                            const next = { ...attrValues, [key]: val };
+                            setAttrValues(next);
+                            if (!initialLoad) callSaveAttr(next);
+                          }}
+                          className="w-6 bg-transparent text-center text-lg font-bold text-white outline-none flex-shrink-0"
+                        />
                       </div>
                     </div>
                   );
