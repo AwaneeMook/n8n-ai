@@ -532,6 +532,7 @@ export default function Chat({
                 right: "32px",
                 width: "calc(100% - 40px)",
                 height: "100%",
+                mixBlendMode: "screen",
               }}
             />
 
@@ -551,6 +552,7 @@ export default function Chat({
                   width: "100px",
                   height: "100px",
                   maxWidth: "none",
+                  mixBlendMode: "screen",
                 }}
               />
               <img
