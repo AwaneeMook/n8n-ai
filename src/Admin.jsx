@@ -669,7 +669,7 @@ export default function Admin({ onBack }) {
                             );
                           })}
                         </div>
-                        <div className="mx-1 h-6 w-px flex-shrink-0 bg-sky-400/50" />
+                        <div className="ml-1 mr-2 h-6 w-px flex-shrink-0 bg-sky-400/50" />
                         <input
                           type="text"
                           inputMode="numeric"
@@ -692,7 +692,7 @@ export default function Admin({ onBack }) {
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
                           }}
-                          className="h-full w-11 flex-shrink-0 bg-transparent text-center text-lg font-bold text-white outline-none transition"
+                          className="mr-2 h-9 w-10 flex-shrink-0 rounded-xl bg-slate-500/25 text-center text-lg font-bold text-white outline-none transition focus:bg-sky-500/30 focus:ring-1 focus:ring-sky-400"
                         />
                       </div>
                     </div>
