@@ -532,7 +532,6 @@ export default function Chat({
                 right: "32px",
                 width: "calc(100% - 40px)",
                 height: "100%",
-                mixBlendMode: "screen",
               }}
             />
 
