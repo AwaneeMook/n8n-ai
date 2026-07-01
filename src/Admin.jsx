@@ -634,7 +634,7 @@ export default function Admin({ onBack }) {
                         {label}
                       </span>
                       <div
-                        className="flex items-center rounded-2xl bg-white/[0.03] py-1.5 pl-3 pr-1.5"
+                        className="flex items-center overflow-hidden rounded-2xl bg-white/[0.03] pl-3"
                         style={{ height: "48px", ...neonBorderStyle }}
                       >
                         <div
@@ -691,8 +691,8 @@ export default function Admin({ onBack }) {
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
                           }}
-                          className="ml-3 h-full w-9 flex-shrink-0 rounded-xl bg-transparent text-center text-lg font-bold text-white outline-none transition"
-                          style={neonBorderStyle}
+                          className="ml-3 h-full w-11 flex-shrink-0 bg-transparent text-center text-lg font-bold text-white outline-none transition"
+                          style={{ borderLeft: "1.5px solid #3366dd" }}
                         />
                       </div>
                     </div>
