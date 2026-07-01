@@ -69,7 +69,7 @@ function buildDisplayText(attrKey, personaKey) {
   const starWord = (i) => `${i + 1}Star${i === 0 ? "" : "s"}`;
   const scoring = groupScoring
     .map((m) => {
-      const sub = m.stars.map((r, i) => `  - ${r} = ${starWord(i)}`).join("\n");
+      const sub = m.stars.map((r, i) => `  • ${r} = ${starWord(i)}`).join("\n");
       return `- ${m.label}:\n${sub}`;
     })
     .join("\n");
