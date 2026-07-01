@@ -1,5 +1,56 @@
 import { useEffect, useRef, useState } from "react";
 import { attributeCriteria } from "./data/attributeCriteria";
+import { cleanHtml } from "./utils/cleanHtml";
+import { personaStats } from "./data/personaStats";
+import { groupScoring } from "./data/groupScoring";
+
+const ATTR_LABEL_MAP = {
+  recruit: "Recruit",
+  management: "Management",
+  salesskill: "Sales Skills",
+  technology: "Technology",
+};
+
+function buildAnalysisPrompt(attrKey, personaKey) {
+  const stats = personaStats[personaKey];
+  if (!stats) return "";
+  const dimension = ATTR_LABEL_MAP[attrKey] || attrKey;
+  const data = [
+    `- Benefit avg = ${stats.benefitAvg}`,
+    `- Deal avg = ${stats.dealAvg}`,
+    `- FP avg = ${stats.fpAvg}`,
+    `- Policy = ${stats.policy}`,
+    `- High Performer = ${stats.highPerformer}`,
+    `- Stability = ${stats.stability}`,
+    `- อาชีพหลัก = ${stats.mainOccupation.join(", ")}`,
+    `- ช่วงอายุ = ${stats.ageRange.join(", ")} ปี`,
+  ].join("\n");
+  const scoring = groupScoring
+    .map((m) => {
+      const ranges = m.stars
+        .map((r, i) => `${r}=${i + 1}Star${i === 0 ? "" : "s"}`)
+        .join(", ");
+      return `- ${m.label}: ${ranges}`;
+    })
+    .join("\n");
+  return `คุณคือผู้เชี่ยวชาญด้านการวิเคราะห์ Persona ตัวแทนประกันและ ${dimension} Analytics
+
+จงวิเคราะห์ข้อมูลต่อไปนี้ในมิติ ${dimension}
+
+ข้อมูล:
+${data}
+
+เกณฑ์การให้ดาว:
+${scoring}
+
+สิ่งที่ต้องตอบ:
+1. ให้ดาวรายมิติพร้อมเหตุผล
+2. คำนวณคะแนนรวมและดาวภาพรวม (1-5 Stars)
+3. วิเคราะห์จุดแข็ง จุดอ่อน และความเสี่ยงด้าน ${dimension}
+4. วิเคราะห์ Persona ของกลุ่ม
+5. สรุปเป็น Executive Summary ไม่เกิน 150 คำ
+6. เสนอแนวทางพัฒนาเพื่อยกระดับเป็นกลุ่ม 4-5 Stars`;
+}
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
@@ -102,7 +153,12 @@ export default function Admin({ onBack }) {
   });
   const [personaLoading, setPersonaLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
-  const [hoverVals, setHoverVals] = useState({ recruit: null, management: null, salesskill: null, technology: null });
+  const [hoverVals, setHoverVals] = useState({
+    recruit: null,
+    management: null,
+    salesskill: null,
+    technology: null,
+  });
 
   // Chat state
   const [messages, setMessages] = useState([
@@ -259,22 +315,18 @@ export default function Admin({ onBack }) {
     sendChat(text, CHAT_URL, { personId: persona?.label ?? "", prompt: text });
   };
 
-  const ATTR_LABEL = {
-    recruit: "Recruit",
-    management: "Management",
-    salesskill: "Sales Skills",
-    technology: "Technology",
-  };
-
   const buildAdminQuickPayload = (promptText, attrKey = null) => {
     const attibute = attrKey
-      ? `${ATTR_LABEL[attrKey]} ${resolveCriteria(attrKey, attrValues[attrKey])}`
+      ? `${ATTR_LABEL_MAP[attrKey]} ${resolveCriteria(attrKey, attrValues[attrKey])}`
       : `Recruit ${resolveCriteria("recruit", attrValues.recruit)} ` +
         `Management ${resolveCriteria("management", attrValues.management)} ` +
         `Sales Skills ${resolveCriteria("salesskill", attrValues.salesskill)} ` +
         `Technology ${resolveCriteria("technology", attrValues.technology)}`;
+    const prompt = attrKey
+      ? buildAnalysisPrompt(attrKey, persona?.key)
+      : promptText;
     return {
-      prompt: promptText,
+      prompt,
       custer: persona?.label ?? "",
       attibute,
     };
@@ -321,15 +373,15 @@ export default function Admin({ onBack }) {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden flex flex-col text-white">
+    <div className="relative min-h-screen w-screen overflow-y-auto flex flex-col text-white">
       <img
         src="/img/admin-bg.png"
         alt=""
-        className="absolute inset-0 w-full h-full z-0"
+        className="fixed inset-0 w-full h-full z-0"
         style={{ objectFit: "fill" }}
       />
       {(initialLoad || personaLoading) && (
-        <div className="absolute inset-0 z-[9999] flex items-center justify-center">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
           <div className="h-14 w-14 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600" />
         </div>
       )}
@@ -347,9 +399,9 @@ export default function Admin({ onBack }) {
         </span>
       </div>
 
-      <div className="relative z-10 w-full flex flex-col lg:flex-row pt-0 px-6 lg:px-12 flex-1">
+      <div className="relative z-10 w-full flex flex-col lg:flex-row pt-0 px-6 lg:px-12 flex-1 ">
         {/* Left 40% */}
-        <div className="w-full lg:w-[40%] flex flex-col items-center justify-center">
+        <div className="w-full lg:w-[40%] flex flex-col items-center lg:self-stretch">
           {/* Top: form */}
           <div className="px-6 pb-6 pt-0 flex flex-col justify-center gap-4 items-center w-full mt-12">
             <div className="w-full max-w-[400px]">
@@ -392,17 +444,18 @@ export default function Admin({ onBack }) {
             </div>
           </div>
           {/* Bottom: logo */}
-          <div className="flex items-start justify-center pt-2 pb-8 mt-2">
+          <div className="flex-1 flex items-end justify-center pb-6 mt-2 min-h-0">
             <img
               src="/img/logo-admin.png"
               alt="Logo"
-              className="object-contain object-top max-w-[90%] h-[90%]"
+              className="object-contain object-bottom max-w-[90%] w-auto"
+              style={{ maxHeight: "clamp(390px, 40vh, 480px)" }}
             />
           </div>
         </div>
 
         {/* Right 60% */}
-        <div className="w-full lg:w-[60%] flex flex-col relative z-10 self-stretch overflow-hidden">
+        <div className="w-full lg:w-[60%] flex flex-col relative z-10">
           <div
             className="relative flex-shrink-0 flex items-center justify-center pl-6"
             style={{ height: "115px" }}
@@ -444,19 +497,30 @@ export default function Admin({ onBack }) {
                       {/* Left: star icons */}
                       <div
                         className="flex items-center gap-1 flex-1"
-                        onMouseLeave={() => setHoverVals((h) => ({ ...h, [key]: null }))}
+                        onMouseLeave={() =>
+                          setHoverVals((h) => ({ ...h, [key]: null }))
+                        }
                       >
                         {Array.from({ length: 5 }).map((_, i) => {
                           const hov = hoverVals[key];
-                          const filled = hov !== null ? i <= hov : i < (Number(attrValues[key]) || 0);
+                          const filled =
+                            hov !== null
+                              ? i <= hov
+                              : i < (Number(attrValues[key]) || 0);
                           return (
                             <img
                               key={i}
-                              src={filled ? "/img/detail/icon-star.png" : "/img/detail/icon-start-empty.png"}
+                              src={
+                                filled
+                                  ? "/img/detail/icon-star.png"
+                                  : "/img/detail/icon-start-empty.png"
+                              }
                               alt=""
                               className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110"
                               style={{ height: "22px", width: "22px" }}
-                              onMouseEnter={() => setHoverVals((h) => ({ ...h, [key]: i }))}
+                              onMouseEnter={() =>
+                                setHoverVals((h) => ({ ...h, [key]: i }))
+                              }
                               onClick={() => {
                                 const next = { ...attrValues, [key]: i + 1 };
                                 setAttrValues(next);
@@ -542,8 +606,11 @@ export default function Admin({ onBack }) {
             </div>
             {/* Row 2 — chat */}
             <div
-              className="relative flex flex-col overflow-hidden flex-shrink-0"
-              style={{ height: "clamp(320px, 46vh, 600px)" }}
+              className="relative flex flex-col overflow-hidden"
+              style={{
+                minHeight: "320px",
+                height: "clamp(320px, 46vh, 600px)",
+              }}
             >
               <img
                 src="/img/chat/4.png"
@@ -586,8 +653,10 @@ export default function Admin({ onBack }) {
                           </span>
                         ) : (
                           <div
-                            className="prose prose-invert prose-sm max-w-none [&_li]:my-2 [&_ul]:my-3 [&_p]:my-2"
-                            dangerouslySetInnerHTML={{ __html: msg.text }}
+                            className="prose prose-invert prose-sm max-w-none [&_li]:my-1 [&_ul]:my-2 [&_p]:my-1 [&_p:empty]:hidden"
+                            dangerouslySetInnerHTML={{
+                              __html: cleanHtml(msg.text),
+                            }}
                           />
                         )}
                         {msg.time && (

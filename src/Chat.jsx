@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { buildQuickPayload } from "./data/promptBuilders";
+import { cleanHtml } from "./utils/cleanHtml";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
@@ -677,8 +678,8 @@ export default function Chat({
                         <span className="whitespace-pre-wrap">{msg.text}</span>
                       ) : (
                         <div
-                          className="prose prose-invert prose-sm max-w-none [&_li]:my-2 [&_ul]:my-3 [&_p]:my-2 [&_br]:block [&_br]:mb-4"
-                          dangerouslySetInnerHTML={{ __html: msg.text }}
+                          className="prose prose-invert prose-sm max-w-none [&_li]:my-1 [&_ul]:my-2 [&_p]:my-1 [&_p:empty]:hidden"
+                          dangerouslySetInnerHTML={{ __html: cleanHtml(msg.text) }}
                         />
                       )}
                       {msg.time && (
