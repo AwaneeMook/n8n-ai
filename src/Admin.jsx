@@ -620,7 +620,7 @@ export default function Admin({ onBack }) {
             {/* Col right — Stars + Quick Prompts */}
             <div className="w-[30%] flex-shrink-0 flex flex-col min-h-0">
               {/* Stars form — expands to fill space */}
-              <div className="flex-1 flex flex-col justify-around py-4 min-h-0">
+              <div className="flex-1 flex flex-col justify-between pt-4 pb-4 min-h-0">
                 {[
                   { key: "recruit", label: "Recruit" },
                   { key: "management", label: "Management" },
