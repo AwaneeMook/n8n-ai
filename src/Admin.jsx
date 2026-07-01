@@ -400,7 +400,7 @@ export default function Admin({ onBack }) {
   };
 
   return (
-    <div className="relative min-h-screen w-screen overflow-y-auto flex flex-col text-white">
+    <div className="relative h-screen w-screen overflow-hidden flex flex-col text-white">
       <img
         src="/img/admin-bg.png"
         alt=""
@@ -426,9 +426,9 @@ export default function Admin({ onBack }) {
         </span>
       </div>
 
-      <div className="relative z-10 w-full flex flex-col lg:flex-row pt-0 px-6 lg:px-12 flex-1 ">
+      <div className="relative z-10 w-full flex flex-col lg:flex-row pt-0 px-6 lg:px-12 flex-1 min-h-0">
         {/* Left 40% */}
-        <div className="w-full lg:w-[40%] flex flex-col items-center lg:self-stretch">
+        <div className="w-full lg:w-[40%] flex flex-col items-center lg:self-stretch min-h-0 overflow-y-auto">
           {/* Top: form */}
           <div className="px-6 pb-6 pt-0 flex flex-col justify-center gap-4 items-center w-full mt-12">
             <div className="w-full max-w-[400px]">
@@ -482,7 +482,7 @@ export default function Admin({ onBack }) {
         </div>
 
         {/* Right 60% */}
-        <div className="w-full lg:w-[60%] flex flex-col relative z-10">
+        <div className="w-full lg:w-[60%] flex flex-col relative z-10 min-h-0">
           <div
             className="relative flex-shrink-0 flex items-center justify-center pl-6"
             style={{ height: "115px" }}
@@ -496,7 +496,7 @@ export default function Admin({ onBack }) {
               Attribute Analysis Setting
             </h2>
           </div>
-          <div className="w-full flex flex-row gap-3 flex-1 overflow-hidden pt-2">
+          <div className="w-full flex flex-row gap-3 flex-1 overflow-hidden pt-2 min-h-0">
 
             {/* Col left — Chat */}
             <div className="flex-1 relative flex flex-col overflow-hidden min-h-0">
