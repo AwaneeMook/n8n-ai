@@ -691,7 +691,8 @@ export default function Admin({ onBack }) {
                             setAttrValues(next);
                             if (!initialLoad) callSaveAttr(next);
                           }}
-                          className="w-6 bg-transparent text-center text-lg font-bold text-white outline-none flex-shrink-0"
+                          className="ml-2 h-8 w-8 flex-shrink-0 rounded-xl bg-transparent text-center text-lg font-bold text-white outline-none transition"
+                          style={neonBorderStyle}
                         />
                       </div>
                     </div>
