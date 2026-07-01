@@ -3,6 +3,7 @@ import { attributeCriteria } from "./data/attributeCriteria";
 import { cleanHtml } from "./utils/cleanHtml";
 import { personaStats } from "./data/personaStats";
 import { groupScoring } from "./data/groupScoring";
+import { buildPersonalContext } from "./data/promptBuilders";
 
 const ATTR_LABEL_MAP = {
   recruit: "Recruit",
@@ -175,6 +176,7 @@ export default function Admin({ onBack }) {
     salesskill: 0,
     technology: 0,
   });
+  const [personaData, setPersonaData] = useState(null);
   const [personaLoading, setPersonaLoading] = useState(true);
   const [initialLoad, setInitialLoad] = useState(true);
   const [hoverVals, setHoverVals] = useState({
@@ -224,6 +226,7 @@ export default function Admin({ onBack }) {
         const item = Array.isArray(data) ? data[0] : data;
         if (item?.success && item.data) {
           const d = item.data;
+          setPersonaData(d);
           setPersonId(d.personid ?? "");
           setAttrValues({
             recruit: d.attribute?.recruit ?? "",
@@ -232,6 +235,7 @@ export default function Admin({ onBack }) {
             technology: d.attribute?.technology ?? "",
           });
         } else {
+          setPersonaData(null);
           setPersonId("");
           setAttrValues({
             recruit: "",
@@ -336,7 +340,11 @@ export default function Admin({ onBack }) {
     const text = input.trim();
     if (!text || chatLoading) return;
     setInput("");
-    sendChat(text, CHAT_URL, { personId: persona?.label ?? "", prompt: text });
+    // แชทพิมพ์เอง — ส่ง custer + attibute เหมือนหน้า Chat (ไม่ส่ง personId)
+    // ต่อท้าย prompt ด้วยข้อมูลส่วนตัวของกลุ่ม
+    const apiPrompt = text + buildPersonalContext(personaData);
+    const payload = { ...buildAdminQuickPayload(text), prompt: apiPrompt };
+    sendChat(text, CHAT_URL, payload);
   };
 
   const buildAdminQuickPayload = (promptText, attrKey = null) => {

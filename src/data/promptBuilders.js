@@ -29,6 +29,42 @@ function resolveCriteria(attrKey, starValue) {
  *
  * หมายเหตุ: key "custer" / "attibute" สะกดตามที่ backend ต้องการ (ห้ามแก้)
  */
+/**
+ * สร้าง string "attibute" (สะกดตามที่ backend ต้องการ) จาก personaData.attribute
+ * ใช้ทั้ง Quick Prompt และแชทพิมพ์เอง เพื่อให้ส่ง attibute เหมือนกันทุกครั้ง
+ */
+export function buildAttibute(personaData) {
+  const attr = personaData?.attribute ?? {};
+  return (
+    `Recruit ${resolveCriteria("recruit", attr.recruit)} ` +
+    `Management ${resolveCriteria("management", attr.management)} ` +
+    `Sales Skills ${resolveCriteria("salesskill", attr.salesskill)} ` +
+    `Technology ${resolveCriteria("technology", attr.technology)}`
+  );
+}
+
+/**
+ * สร้างข้อความ "โดยมีข้อมูลส่วนตัว ..." ต่อท้ายคำที่ผู้ใช้พิมพ์เอง
+ * รูปแบบเดียวกับ prompt ของ Quick Prompt (ฝั่ง cluster / ไม่เลือก member)
+ * คืน "" ถ้าไม่มี personaData
+ */
+export function buildPersonalContext(personaData) {
+  if (!personaData) return "";
+  const gender = GENDER_MAP[personaData?.sex] ?? personaData?.sex ?? "ไม่ระบุ";
+  const age = personaData?.age ?? "ไม่ระบุ";
+  const education = personaData?.education ?? "ไม่ระบุ";
+  const occupation = personaData?.occupation_descript ?? "ไม่ระบุ";
+  const experience = personaData?.workingYears ?? "ไม่ระบุ";
+  const district = personaData?.district ?? "ไม่ระบุ";
+  const products =
+    (personaData?.top3 ?? []).map((p) => p.name).join(", ") || "ไม่ระบุ";
+  return (
+    ` โดยมีข้อมูลส่วนตัว Gender ${gender} Age ${age} Education ${education} ` +
+    `Occupation ${occupation} Full Time Experience ${experience} years ` +
+    `District ${district} ขายประกันแบบ ${products} มากสุดเรียงตามลำดับ`
+  );
+}
+
 export function buildQuickPayload({ persona, personaData, memberMode, personId, title }) {
   const clusterKey = persona?.key ?? ID_TO_KEY[persona?.id] ?? "";
   const cluster = clusterByKey[clusterKey] ?? {};
@@ -43,12 +79,7 @@ export function buildQuickPayload({ persona, personaData, memberMode, personId, 
   const products =
     (personaData?.top3 ?? []).map((p) => p.name).join(", ") || "ไม่ระบุ";
 
-  const attr = personaData?.attribute ?? {};
-  const attibute =
-    `Recruit ${resolveCriteria("recruit", attr.recruit)} ` +
-    `Management ${resolveCriteria("management", attr.management)} ` +
-    `Sales Skills ${resolveCriteria("salesskill", attr.salesskill)} ` +
-    `Technology ${resolveCriteria("technology", attr.technology)}`;
+  const attibute = buildAttibute(personaData);
 
   if (memberMode) {
     return {

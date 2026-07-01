@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { buildQuickPayload } from "./data/promptBuilders";
+import {
+  buildQuickPayload,
+  buildAttibute,
+  buildPersonalContext,
+} from "./data/promptBuilders";
 import { cleanHtml } from "./utils/cleanHtml";
 
 // soft black backdrop that fades out at the edges to blend with the page
@@ -250,7 +254,19 @@ export default function Chat({
     const text = input.trim();
     if (!text || loading) return;
     setInput("");
-    appendUserAndFetch(text, text);
+    // แชทพิมพ์เอง — ส่ง custer + attibute ไปด้วยเหมือน Quick Prompt
+    // ไม่เลือก member → ต่อท้าย prompt ด้วยข้อมูลส่วนตัวของกลุ่ม
+    // เลือก member → ส่ง personId (backend query ข้อมูลคนนั้นเอง)
+    const apiPrompt = memberSelected
+      ? text
+      : text + buildPersonalContext(activePersonaData);
+    const body = {
+      prompt: apiPrompt,
+      custer: persona?.label ?? "",
+      attibute: buildAttibute(activePersonaData),
+      ...(memberSelected ? { personId } : {}),
+    };
+    appendUserAndFetch(text, apiPrompt, body);
   };
 
   const handleKeyDown = (e) => {
