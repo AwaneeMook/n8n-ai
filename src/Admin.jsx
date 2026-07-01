@@ -626,17 +626,21 @@ export default function Admin({ onBack }) {
                   { key: "management", label: "Management" },
                   { key: "salesskill", label: "Sales Skills" },
                   { key: "technology", label: "Technology" },
-                ].map(({ key, label }) => (
-                  <div key={key} className="flex items-center gap-2">
-                    <span className="w-28 shrink-0 text-right text-sm font-bold text-white">
-                      {label}
-                    </span>
-                    <div
-                      className="flex items-center rounded-3xl bg-transparent flex-1 px-2"
-                      style={{ height: "40px", ...neonBorderStyle }}
-                    >
+                ].map(({ key, label }) => {
+                  const score = Number(attrValues[key]) || 0;
+                  return (
+                    <div key={key} className="flex flex-col gap-1.5">
+                      <div className="flex items-center justify-between px-1">
+                        <span className="text-sm font-bold uppercase tracking-wide text-sky-100">
+                          {label}
+                        </span>
+                        <span className="text-xs font-bold text-sky-300/80">
+                          {score}/5
+                        </span>
+                      </div>
                       <div
-                        className="flex items-center gap-1 flex-1"
+                        className="flex items-center justify-center gap-2.5 rounded-2xl bg-white/[0.03] px-4"
+                        style={{ height: "48px", ...neonBorderStyle }}
                         onMouseLeave={() =>
                           setHoverVals((h) => ({ ...h, [key]: null }))
                         }
@@ -644,9 +648,7 @@ export default function Admin({ onBack }) {
                         {Array.from({ length: 5 }).map((_, i) => {
                           const hov = hoverVals[key];
                           const filled =
-                            hov !== null
-                              ? i <= hov
-                              : i < (Number(attrValues[key]) || 0);
+                            hov !== null ? i <= hov : i < score;
                           return (
                             <img
                               key={i}
@@ -656,8 +658,8 @@ export default function Admin({ onBack }) {
                                   : "/img/detail/icon-start-empty.png"
                               }
                               alt=""
-                              className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110"
-                              style={{ height: "20px", width: "20px" }}
+                              className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-125"
+                              style={{ height: "24px", width: "24px" }}
                               onMouseEnter={() =>
                                 setHoverVals((h) => ({ ...h, [key]: i }))
                               }
@@ -670,33 +672,9 @@ export default function Admin({ onBack }) {
                           );
                         })}
                       </div>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        value={attrValues[key]}
-                        onChange={(e) => {
-                          const raw = e.target.value
-                            .replace(/\D/g, "")
-                            .slice(0, 1);
-                          if (raw === "0") return;
-                          const next = { ...attrValues, [key]: raw };
-                          setAttrValues(next);
-                          if (!initialLoad) callSaveAttr(next);
-                        }}
-                        onBlur={(e) => {
-                          const val = Math.min(
-                            5,
-                            Math.max(1, Number(e.target.value) || 1),
-                          );
-                          const next = { ...attrValues, [key]: val };
-                          setAttrValues(next);
-                          if (!initialLoad) callSaveAttr(next);
-                        }}
-                        className="w-6 bg-transparent text-center text-base font-bold text-white outline-none flex-shrink-0"
-                      />
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Quick Prompts — pinned to bottom */}
