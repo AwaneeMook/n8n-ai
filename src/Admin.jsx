@@ -52,6 +52,30 @@ ${scoring}
 6. เสนอแนวทางพัฒนาเพื่อยกระดับเป็นกลุ่ม 4-5 Stars`;
 }
 
+function buildDisplayText(attrKey, personaKey) {
+  const stats = personaStats[personaKey];
+  if (!stats) return "";
+  const dimension = ATTR_LABEL_MAP[attrKey] || attrKey;
+  const data = [
+    `- Benefit avg = ${stats.benefitAvg}`,
+    `- Deal avg = ${stats.dealAvg}`,
+    `- FP avg = ${stats.fpAvg}`,
+    `- Policy = ${stats.policy}`,
+    `- High Performer = ${stats.highPerformer}`,
+    `- Stability = ${stats.stability}`,
+    `- อาชีพหลัก = ${stats.mainOccupation.join(", ")}`,
+    `- ช่วงอายุ = ${stats.ageRange.join(", ")} ปี`,
+  ].join("\n");
+  const scoring = groupScoring
+    .map((m) => {
+      const starLabels = ["1★", "2★★", "3★★★", "4★★★★", "5★★★★★"];
+      const ranges = m.stars.map((r, i) => `${starLabels[i]}=${r}`).join("  ");
+      return `  ${m.label}:\n    ${ranges}`;
+    })
+    .join("\n");
+  return `วิเคราะห์ด้าน ${dimension} จากข้อมูล\n\n${data}\n\nเกณฑ์การให้ดาว:\n${scoring}`;
+}
+
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
   "https://tli0107.candidsandbox.academy/webhook";
@@ -334,7 +358,10 @@ export default function Admin({ onBack }) {
 
   const handleQuickPrompt = (promptText, attrKey = null) => {
     const payload = buildAdminQuickPayload(promptText, attrKey);
-    sendChat(promptText, CHAT_QUICK_URL, payload);
+    const displayText = attrKey
+      ? buildDisplayText(attrKey, persona?.key)
+      : promptText;
+    sendChat(displayText, CHAT_QUICK_URL, payload);
   };
 
   const handleChatKeyDown = (e) => {
