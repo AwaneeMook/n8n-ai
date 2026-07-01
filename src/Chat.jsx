@@ -465,6 +465,7 @@ export default function Chat({
                 src="/img/chat/icon-ai-command.png"
                 alt=""
                 className="w-full h-full object-contain"
+                style={{ mixBlendMode: "screen" }}
               />
             </div>
 
