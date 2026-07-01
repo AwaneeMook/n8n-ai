@@ -595,9 +595,9 @@ export default function Admin({ onBack }) {
             </div>
 
             {/* Col right — Stars (top) + Quick Prompts (bottom) */}
-            <div className="w-[38%] flex-shrink-0 flex flex-col gap-3">
-              {/* Stars form */}
-              <div className="flex flex-col gap-3 py-2 px-2">
+            <div className="w-[38%] flex-shrink-0 flex flex-col min-h-0">
+              {/* Stars form — expands to fill space */}
+              <div className="flex-1 flex flex-col justify-around py-4 px-2 min-h-0">
                 {[
                   { key: "recruit", label: "Recruit" },
                   { key: "management", label: "Management" },
@@ -605,13 +605,13 @@ export default function Admin({ onBack }) {
                   { key: "technology", label: "Technology" },
                 ].map(({ key, label }) => (
                   <div key={key} className="flex items-center gap-2">
-                    <span className="w-28 shrink-0 text-right text-sm font-bold text-white">{label}</span>
+                    <span className="w-28 shrink-0 text-right text-base font-bold text-white">{label}</span>
                     <div
-                      className="flex items-center rounded-3xl bg-transparent flex-1 px-2"
-                      style={{ height: "40px", ...neonBorderStyle }}
+                      className="flex items-center rounded-3xl bg-transparent flex-1 px-3"
+                      style={{ height: "46px", ...neonBorderStyle }}
                     >
                       <div
-                        className="flex items-center gap-1 flex-1"
+                        className="flex items-center gap-1.5 flex-1"
                         onMouseLeave={() => setHoverVals((h) => ({ ...h, [key]: null }))}
                       >
                         {Array.from({ length: 5 }).map((_, i) => {
@@ -623,7 +623,7 @@ export default function Admin({ onBack }) {
                               src={filled ? "/img/detail/icon-star.png" : "/img/detail/icon-start-empty.png"}
                               alt=""
                               className="object-contain flex-shrink-0 cursor-pointer transition-transform hover:scale-110"
-                              style={{ height: "20px", width: "20px" }}
+                              style={{ height: "26px", width: "26px" }}
                               onMouseEnter={() => setHoverVals((h) => ({ ...h, [key]: i }))}
                               onClick={() => {
                                 const next = { ...attrValues, [key]: i + 1 };
@@ -651,15 +651,15 @@ export default function Admin({ onBack }) {
                           setAttrValues(next);
                           if (!initialLoad) callSaveAttr(next);
                         }}
-                        className="w-6 bg-transparent text-center text-base font-bold text-white outline-none flex-shrink-0"
+                        className="w-7 bg-transparent text-center text-lg font-bold text-white outline-none flex-shrink-0"
                       />
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Quick Prompts */}
-              <div className="flex flex-col gap-2 px-2">
+              {/* Quick Prompts — pinned to bottom */}
+              <div className="flex flex-col gap-2 px-2 pb-4">
                 <div className="text-xs font-bold tracking-widest text-sky-400 uppercase px-1">
                   Quick Prompts
                 </div>
